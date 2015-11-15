@@ -255,8 +255,7 @@ class EquipStateManeger(models.Manager):
                                                 defaults={'data':obj.data,'state_date':obj.state_date})
 
         # 更新设备状态
-
-        update_laboratory_state.delay()
+        Equipment.objects.filter(id=obj.equip_id).update(work_flag=1)
 
         return obj
 

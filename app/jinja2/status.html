@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -36,14 +37,14 @@
                 <div class="row ">
                     <div class="col-md-12">
                         <p class="text-center"><strong class="text-primary ">我猜实验室里面有人在！</strong></p>
-                        <p class="bg-success" style="padding: 10px"><span class="glyphicon glyphicon-time"></span>更新时间：2015-11-13</p>
-                        <p class="bg-primary" style="padding: 10px"><span class="glyphicon glyphicon-user"></span>当前人数：7(大概)</p>
+                        <p class="bg-success" style="padding: 10px"><span class="glyphicon glyphicon-time"></span>更新时间：{{ data.update_time|date_time}}</p>
+                        <p class="bg-primary" style="padding: 10px"><span class="glyphicon glyphicon-user"></span>当前人数：{{ data.number }}(大概)</p>
 
-                        <p class="bg-danger" style="padding: 10px"><span class="glyphicon glyphicon-fire"></span>温度：20℃</p>
+                        <p class="bg-danger" style="padding: 10px"><span class="glyphicon glyphicon-fire"></span>温度：{{ data.temperature }}℃</p>
 
-                        <p class="bg-info" style="padding: 10px"><span class="glyphicon glyphicon-tint"></span>湿度：30%</p>
+                        <p class="bg-info" style="padding: 10px"><span class="glyphicon glyphicon-tint"></span>湿度：30{{ data.humidity }}%</p>
 
-                        <p class="bg-warning" style="padding: 10px"><span class="fa fa-sun-o fa-lg"></span>光照：300lx</p>
+                        <p class="bg-warning" style="padding: 10px"><span class="fa fa-sun-o fa-lg"></span>光照：{{ data.lx }}lx</p>
                     </div>
                 </div>
                 <p class="text-center"><a class="btn btn-primary btn-lg text-center" href="{{ url('index') }}" role="button">进入实验室管理</a></p>

@@ -25,6 +25,7 @@ from os import environ
 
 from datetime import timedelta
 from celery.schedules import crontab
+
 debug = not environ.get("APP_NAME", "")
 
 # Quick-start development settings - unsuitable for production
@@ -60,10 +61,10 @@ INSTALLED_APPS = (
 # IsAuthenticatedOrReadOnly
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': ('rest_framework.permissions.IsAdminUser',),
-    #'DEFAULT_RENDERER_CLASSES': ('rest_framework.renderers.JSONRenderer',),  # 不使用浏览器模式
+    # 'DEFAULT_RENDERER_CLASSES': ('rest_framework.renderers.JSONRenderer',),  # 不使用浏览器模式
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 100,
-    'PAGINATE_BY':10,
+    'PAGINATE_BY': 10,
     'PAGINATE_BY_PARAM': 'page_size',
     'MAX_PAGINATE_BY': 100
 }
@@ -80,7 +81,7 @@ MIDDLEWARE_CLASSES = (
 )
 
 ROOT_URLCONF = 'IOTplatform.urls'
-
+DATETIME_FORMAT = '%Y-%m-%d %H:%M:%S'
 TEMPLATES = [
     # {
     #     "BACKEND": "django.template.backends.jinja2.Jinja2",
@@ -105,7 +106,9 @@ TEMPLATES = [
             "match_extension": ".html",
             # "match_regex": r"^(?!admin/).*",
             "app_dirname": os.path.join(BASE_DIR, 'app'),
-
+            "filters": {
+                "date_time": "app.filter.date_time",
+            },
             # Can be set to "jinja2.Undefined" or any other subclass.
             "undefined": None,
 
@@ -123,6 +126,7 @@ TEMPLATES = [
                 "django_jinja.builtins.extensions.UrlsExtension",
                 "django_jinja.builtins.extensions.StaticFilesExtension",
                 "django_jinja.builtins.extensions.DjangoFiltersExtension",
+
             ],
             "context_processors": [
                 "django.contrib.auth.context_processors.auth",
@@ -224,10 +228,10 @@ AUTHENTICATION_BACKENDS = (
 )
 
 ## Broker settings.
-BROKER_URL ='redis://localhost:6379/0'
+BROKER_URL = 'redis://localhost:6379/0'
 
 # List of modules to import when celery starts.
-CELERY_IMPORTS = ('app.tasks', )
+CELERY_IMPORTS = ('app.tasks',)
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
@@ -243,11 +247,11 @@ CELERY_RESULT_SERIALIZER = 'json'
 # }
 
 
-CELERY_TASK_RESULT_EXPIRES = 1200 # celery任务执行结果的超时时间，我的任务都不需要返回结果,只需要正确执行就行
-CELERYD_CONCURRENCY = 2 # celery worker的并发数 也是命令行-c指定的数目,事实上实践发现并不是worker也多越好,保证任务不堆积,加上一定新增任务的预留就可以
-CELERYD_PREFETCH_MULTIPLIER = 2 # celery worker 每次去redies取任务的数量，我这里预取了4个慢慢执行,因为任务有长有短没有预取太多
-CELERYD_MAX_TASKS_PER_CHILD = 40 # 每个worker执行了多少任务就会死掉，我建议数量可以大一些，比如200
-CELERYD_TASK_TIME_LIMIT = 1800 # 任务超时时间
+CELERY_TASK_RESULT_EXPIRES = 1200  # celery任务执行结果的超时时间，我的任务都不需要返回结果,只需要正确执行就行
+CELERYD_CONCURRENCY = 2  # celery worker的并发数 也是命令行-c指定的数目,事实上实践发现并不是worker也多越好,保证任务不堆积,加上一定新增任务的预留就可以
+CELERYD_PREFETCH_MULTIPLIER = 2  # celery worker 每次去redies取任务的数量，我这里预取了4个慢慢执行,因为任务有长有短没有预取太多
+CELERYD_MAX_TASKS_PER_CHILD = 40  # 每个worker执行了多少任务就会死掉，我建议数量可以大一些，比如200
+CELERYD_TASK_TIME_LIMIT = 1800  # 任务超时时间
 
 # CELERY_DEFAULT_QUEUE = "default_dongwm" # 默认的队列，如果一个消息不符合其他的队列就会放在默认队列里面
 #

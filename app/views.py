@@ -87,21 +87,15 @@ class Index(TemplateView):
 
 
 class Status(TemplateView):
-    queryset = LaboratoryState
     template_name = 'status.html'
 
-    # def get_context_data(self, **kwargs):
-    #     if not adminPermission(self.request.user):
-    #         qe = Equipment.objects.filter(user_id=self.request.user.id)
-    #     else:
-    #         qe = Equipment.objects.all()
-    #
-    #     data = []
-    #     for j in xrange(3):
-    #         data.append(qe.filter(work_flag=j).count())
-    #     context = super(Index, self).get_context_data(**kwargs)
-    #     context['data'] = data
-    #     return context
+    def get_context_data(self, **kwargs):
+        qe = LaboratoryState.objects.last()
+
+        context = super(Status, self).get_context_data(**kwargs)
+        #context['data'] = qe.__dict__
+        context['data'] = qe
+        return context
 
 
 def loginApp(request):
