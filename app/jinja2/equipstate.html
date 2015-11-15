@@ -1,0 +1,83 @@
+{% extends 'equip.html' %}
+{% block title %}
+    <title>设备状态</title>
+{% endblock title %}
+{% block div %}
+    <!-- Modal -->
+    <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                            aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">控制界面</h4>
+                </div>
+
+                <div class="modal-body">
+                    <div class="container-fluid">
+                        <div class="row">
+                            <div class="col-md-6 col-sm-6 col-lg-6">
+                                <div class="input-group">
+                                    <input type="text" class="form-control" placeholder="例如关机:{poweroff:1}">
+                                      <span class="input-group-btn">
+{#        <button class="btn btn-default" type="button" href="{{ url('sendcmd') }}">发送!</button>#}
+          <a type="button" class="btn btn-primary">发送控制命令</a>
+      </span>
+                                </div>
+                                <!-- /input-group -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <!-- /.modal -->
+{% endblock div %}
+<script>
+    {% block modalshow %}
+
+        {# 显示控制详细信息 #}
+        $("#example").on('click', 'td', function () {
+
+            if (detailsFlag) {
+                $('div.innerDetails', $(this)).slideUp();
+                $('div.Details', $(this)).slideDown();
+                detailsFlag = false;
+            }
+            else {
+                $('div.innerDetails', $(this)).slideDown();
+                $('div.Details', $(this)).slideUp();
+                detailsFlag = true;
+
+            }
+            //显示详细信息结束
+        }).on('click', 'button', function () {
+            {#显示模型框#}
+{#            id = oTable.cell($(this).parents().parents('tr').children('td').eq(0)).data();#}
+            {#模态框手动打开#}
+            $('#myModal').on('shown.bs.modal', function () {
+                // do something...
+
+                {#避免重复响应事件#}
+                $(this).off('shown.bs.modal');
+
+            })/*显示模态框结束*/
+                    {#模态框手动打开#}
+                    .modal('show')
+                    {#模态框隐藏事件#}
+                    .on('hidden.bs.modal', function () {
+                        {#关闭模态框隐藏事件监听动作,避免重复调用#}
+                        $(this).off('hidden.bs.modal');
+                    });
+
+        });//表格点击事件结束
+
+    {% endblock modalshow %}
+</script>

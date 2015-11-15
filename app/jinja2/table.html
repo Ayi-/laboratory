@@ -1,0 +1,47 @@
+{% if messages %}
+<div  style="position: fixed;bottom: 24px;display: block;z-index:10;">
+    {% for message in messages %}
+
+        {% if message.tags %}
+            <div id="alert_message" class="alert alert-{{ message.tags }} hidden-sm hidden-xs" role="alert">
+        {% else %}
+            <div id="alert_message" class="alert alert-danger hidden-sm hidden-xs" role="alert">
+        {% endif %}
+    <button type="button" class="close" data-dismiss="alert">
+        <i class="ace-icon fa fa-times">
+            <span aria-hidden="true"></span>
+        </i>
+    </button>
+    <span class="glyphicon glyphicon-exclamation-sign"></span>
+    {{ message|striptags }}
+    </div>
+    {% endfor %}
+    </div>
+
+{% endif %}
+<div class="panel panel-primary">
+    <div class="panel-body" style="background-color: #fff">
+        <div class="dataTables_wrapper">
+            <table class="table dataTable  /*table-condensed*/ table-hover /*table-bordered*/" width="100%"
+                   style="width: 100%"
+                   id="example">
+                <thead>
+                <tr>
+                    {% for th in order_columns %}
+                        <th>{{ th.verbose_name }}</th>
+                    {% endfor %}
+                    <th>控制栏</th>
+                </tr>
+                </thead>
+                <tfoot>
+                <tr>
+                    {% for th in order_columns %}
+                        <th></th>
+                    {% endfor %}
+                </tr>
+                </tfoot>
+                <tbody></tbody>
+            </table>
+        </div>
+    </div>
+</div>

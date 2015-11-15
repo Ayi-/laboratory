@@ -1,0 +1,279 @@
+{% extends 'equip.html' %}
+{% block title %}
+    <title>设备列表</title>
+{% endblock title %}
+{% block div %}
+    <!-- Modal -->
+    <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                            aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">控制界面</h4>
+                </div>
+
+                <div class="modal-body">
+                    <div class="container-fluid">
+                        <div class="row">
+                            <div class="col-md-6 col-sm-6 col-lg-6">
+                                <div class="input-group">
+                                    <input type="text" class="form-control" placeholder="例如关机:{poweroff:1}">
+                                      <span class="input-group-btn">
+{#        <button class="btn btn-default" type="button" href="{{ url('sendcmd') }}">发送!</button>#}
+          <a type="button" class="btn btn-primary">发送控制命令</a>
+      </span>
+                                </div>
+                                <!-- /input-group -->
+                            </div>
+                            {% if  type == "equip" %}
+                                <div class="col-md-6 col-sm-6 col-lg-6">
+                                    <div class=" alert-info" role="alert">
+                                        显示当前坐标点
+                                        <input type="text" id="raidus" class="form" value="2" placeholder="2">
+                                        公里范围内的其他点
+                                    </div>
+                                    <div id="modalMap" style="width: 100% ; height: 300px;"></div>
+                                </div>
+                                <div class="col-md-6 col-sm-6 col-lg-6">
+                                </div>
+                                <div class="col-md-6 col-sm-6 col-lg-6">
+                                    <div id="modalresult" style="width: 100% ; height: 200px;overflow: scroll">
+                                        <div class="alert alert-success">
+                                            <h4><i class="ace-icon fa fa-check green"></i>
+                                                显示导航路线
+                                            </h4></div>
+                                    </div>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+
+                    <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+                    <button id="delete_eq1" class="btn btn-danger">
+                        删除该设备
+                    </button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <!-- /.modal -->
+
+    <div class="modal fade bs-example-modal-sm" role="dialog" id="deleteModal">
+        <div class="modal-dialog modal-sm" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                            aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="gridSystemModalLabel">确认删除</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="container-fluid">
+                        <div class="row">
+                            <div class="col-md-12 text-danger">确认删除本设备吗？</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <div class="col-md-12">
+                        <button type="button" id="delete_eq2" class="btn btn-primary">确认</button>
+                        <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                    </div>
+                </div>
+            </div>
+            <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+
+{% endblock div %}
+
+<script>
+    {% block modalshow %}
+
+        {#               删除设置#}
+        $('#delete_eq1').on('click', function () {
+            $('#deleteModal').modal('show');
+
+        });
+        $("#delete_eq2").on('click', function () {
+            $(this).attr({"disabled": "disabled"});
+            $.ajax(this.value, {
+                type: 'DELETE',
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader("X-CSRFToken", document.getElementsByName('csrfmiddlewaretoken')[0].value)
+                },
+                success: function (responseData) {
+                    console.log(responseData);
+                    $('#deleteModal').modal('hide');
+                    $('#myModal').modal('hide');
+                    oTable.ajax.reload(null, false);
+                    $(this).attr({"disabled": ""});
+
+                }
+            });
+
+        });
+
+        {# 显示控制详细信息 #}
+        $("#example").on('click', 'td', function () {
+
+            if (detailsFlag) {
+                $('div.innerDetails', $(this)).slideUp();
+                $('div.Details', $(this)).slideDown();
+                detailsFlag = false;
+            }
+            else {
+                $('div.innerDetails', $(this)).slideDown();
+                $('div.Details', $(this)).slideUp();
+                detailsFlag = true;
+
+            }
+            //显示详细信息结束
+        }).on('click', 'button', function () {
+            {#显示模型框#}
+            {#获取经纬度#}
+
+            id = oTable.cell($(this).parents().parents('tr').children('td').eq(0)).data();
+            {#                            gps_longitude = oTable.cell($(this).parents().parents('tr').children('td').eq(10)).data();#}
+            {#                            gps_latitude = oTable.cell($(this).parents().parents('tr').children('td').eq(11)).data();#}
+            {#创建地图坐标点#}
+            {#                            startPoint = new BMap.Point(gps_longitude, gps_latitude);#}
+
+            {#模态框手动打开#}
+            $('#myModal').on('shown.bs.modal', function () {
+                // do something...
+                {#设置覆盖物#}
+
+                document.getElementById("delete_eq2").value = "{{ url('equipment-list') }}" + id + '/';
+                overlay_style();
+
+                {#避免重复响应事件#}
+                $(this).off('shown.bs.modal');
+
+            })/*显示模态框结束*/
+                    {#模态框手动打开#}
+                    .modal('show')
+                    {#模态框隐藏事件#}
+                    .on('hidden.bs.modal', function () {
+
+                        {#清理导航结果#}
+                        driving.clearResults();
+                        {#清理所有覆盖物#}
+                        modalMap.clearOverlays();
+
+                        {#关闭模态框隐藏事件监听动作,避免重复调用#}
+                        $(this).off('hidden.bs.modal');
+                    });
+
+        });//表格点击事件结束
+        {#修复表格 #}
+        {#                $('tbody').attr('role', "alert", 'aria-live', "polite", 'aria-relevant', "all")#}
+        {#                        .attr('aria-live', "polite")#}
+        {#                        .attr('aria-relevant', "all");#}
+
+        {#初始化地图，设置中心点坐标和地图级别#}
+        modalMap = new BMap.Map("modalMap");          // 创建地图实例
+        modalMap.centerAndZoom("龙岩", 14);
+
+        {#监听右键菜单打开事件#}
+        modalMap.addEventListener("open", function (e) {
+            rcLng = e.point.lng;
+            rcLat = e.point.lat;
+        });
+
+        {#初始化驾车索引#}
+        //三种驾车策略：最少时间，最短距离，避开高速
+        var routePolicy = [BMAP_DRIVING_POLICY_LEAST_TIME, BMAP_DRIVING_POLICY_LEAST_DISTANCE,
+            BMAP_DRIVING_POLICY_AVOID_HIGHWAYS];
+        driving = new BMap.DrivingRoute(modalMap, {
+            renderOptions: {
+                map: modalMap, panel: "modalresult",
+                enableDragging: true, /*起终点可进行拖拽*//*, autoViewport: true*/
+                policy: routePolicy[1]
+            }
+        });
+
+        {#设置右键菜单#}
+        endFlag = 0;
+        var menu = new BMap.ContextMenu();
+        var txtMenuItem = [
+            {
+                text: '放大',
+                callback: function (e) {
+                    modalMap.setCenter(new BMap.Point(e.lng, e.lat));
+                    modalMap.zoomIn();
+                }
+            },
+            {
+                text: '缩小',
+                callback: function (e) {
+                    modalMap.setCenter(new BMap.Point(e.lng, e.lat));
+                    modalMap.zoomOut();
+                }
+            },
+            {
+                text: '以此为终点',
+                callback: function (e) {
+                    if (endFlag == 0) {
+                        marker = new BMap.Marker(new BMap.Point(e.lng, e.lat));
+                        endFlag = 1;
+                    }
+
+                    modalMap.removeOverlay(marker);
+                    endPoint = new BMap.Point(e.lng, e.lat);
+                    marker = new BMap.Marker(endPoint);
+                    marker.enableDragging();
+                    modalMap.addOverlay(marker);
+                    $("#points").val(e.lng + '|' + e.lat);//获取拖动后的坐标
+                    driving.search(startPoint, endPoint, policy = routePolicy[1]);
+                }
+            }
+        ];
+        for (var i = 0; i < txtMenuItem.length; i++) {
+            menu.addItem(new BMap.MenuItem(txtMenuItem[i].text, txtMenuItem[i].callback, 100));
+        }
+        modalMap.addContextMenu(menu);
+
+        {#    范围内多个覆盖物设置#}
+        $('#raidus').on('keyup', function (e) {
+            if (e.keyCode == 13) {
+                modalMap.clearOverlays();
+                overlay_style();
+            }
+        });
+        //设置覆盖物
+        function overlay_style(e) {
+            $.getJSON(
+                    "{{ url('equipment-list') }}" + id, {}, function (data) {
+                        {#                                    var circle = new BMap.Circle(startPoint, data.raidus);#}
+                        {#                                    modalMap.addOverlay(circle);            //增加圆#}
+                        if (data.id != '')
+                        $.getJSON(
+                                "{{ url('position-list') }}" + data.position, {}, function (data) {
+
+                                    if (data.id != '') {
+                                        gps_longitude = data.gps_longitude;
+                                        gps_latitude = data.gps_latitude;
+                                        {#创建地图坐标点#}
+                                        startPoint = new BMap.Point(gps_longitude, gps_latitude);
+
+                                        {#                                        点击的坐标增加跳动显示#}
+                                        modelMarker = new BMap.Marker(startPoint);
+                                        modalMap.addOverlay(modelMarker);  // 将标注添加到地图中
+                                        modalMap.panTo(startPoint);
+                                        modelMarker.setAnimation(BMAP_ANIMATION_BOUNCE); //跳动的动画
+
+                                    }//function end
+                                });//end get position
+                    }
+            );// end get position id
+        }
+
+    {% endblock modalshow %}
+</script>
