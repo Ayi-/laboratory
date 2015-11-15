@@ -1,6 +1,6 @@
 # -*- coding:utf8 -*-
 from django.contrib import admin
-from app.models import User,Equipment,Position,Permission, EquipStateAll, EquipStateLast
+from app.models import User,Equipment,Position,Permission, EquipStateAll, EquipStateLast, LaboratoryState
 
 # class UserAdmin(admin.ModelAdmin):
 #     """
@@ -19,3 +19,4 @@ admin.site.register(EquipStateAll)
 admin.site.register(EquipStateLast)
 admin.site.register(Position)
 admin.site.register(Permission)
+admin.site.register(LaboratoryState)

@@ -26,7 +26,7 @@ from os import environ
 from datetime import timedelta
 from celery.schedules import crontab
 
-debug = not environ.get("APP_NAME", "")
+# debug = not environ.get("APP_NAME", "") # SAE
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.8/howto/deployment/checklist/
@@ -168,7 +168,7 @@ WSGI_APPLICATION = 'IOTplatform.wsgi.application'
 # https://docs.djangoproject.com/en/1.8/ref/settings/#databases
 
 
-if debug:
+if DEBUG:
     MYSQL_DB = 'iotplatform'
     MYSQL_USER = 'root'
     MYSQL_PASS = '0000'

@@ -11,7 +11,7 @@ from app.models import LaboratoryState,EquipStateLast
 
 
 @shared_task
-def update_laboratory_state(self,lab_number):
+def update_laboratory_state(lab_number):
     lab_state_number = LaboratoryState.objects.only('number').last().number
     eq_state_2 = EquipStateLast.objects.get(id=2).data.split('|')  # 获取设备号2的最近数据数据
     LaboratoryState.objects.create(
