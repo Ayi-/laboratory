@@ -22,3 +22,15 @@ def update_laboratory_state(lab_number):
     )
     return True
 
+
+@shared_task
+def reset_laboratory_state():
+    eq_state_2 = EquipStateLast.objects.get(id=2).data.split('|')  # 获取设备号2的最近数据数据
+    LaboratoryState.objects.create(
+        number=0,
+        temperature=eq_state_2[0].split(':')[1],
+        humidity=eq_state_2[1].split(':')[1],
+        lx=eq_state_2[2].split(':')[1]
+    )
+    return True
+
