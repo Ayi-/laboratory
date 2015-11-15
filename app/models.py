@@ -272,7 +272,6 @@ class AbstractEquipState(models.Model):
         abstract = True
 
 
-
 class LaboratoryState(models.Model):
     '''
     用于存放当前状态数据，每10分钟更新一次
