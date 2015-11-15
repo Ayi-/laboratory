@@ -2,9 +2,10 @@
 from django.utils import timezone
 
 __author__ = 'AE'
-
+import os
 from celery import shared_task
-from datetime import datetime
+
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "IOTplatform.settings")
 from app.models import LaboratoryState,EquipStateLast
 
 @shared_task
