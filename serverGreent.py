@@ -16,7 +16,7 @@ from django.db import connection
 # c=db.cursor()
 
 from app.models import EquipStateAll,Equipment
-from IOTplatform.celery import update_laboratory_state
+from app.tasks import update_laboratory_state
 def laboratory(socket, address):
     data = socket.recv(BUFSIZE).split(',')
     if int(data[-1])>4000 or data[0] !=1: #

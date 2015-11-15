@@ -19,7 +19,7 @@ from django.utils.six import python_2_unicode_compatible
 
 from django.utils.translation import ugettext_lazy as _
 
-from app.tasks import update_laboratory_state
+
 # Create your models here.
 
 @python_2_unicode_compatible

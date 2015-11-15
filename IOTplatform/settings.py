@@ -234,13 +234,13 @@ CELERY_RESULT_SERIALIZER = 'json'
 
 # timedelta(seconds=30),定时30秒
 
-CELERYBEAT_SCHEDULE  = {
-    'add-every-time': {
-        'task': 'app.tasks.add',
-        'schedule': crontab(minute=0,hour='*'),
-        'args': (16, 16)
-    },
-}
+# CELERYBEAT_SCHEDULE  = {
+#     'add-every-time': {
+#         'task': 'app.tasks.add',
+#         'schedule': crontab(minute=0,hour='*'),
+#         'args': (16, 16)
+#     },
+# }
 
 
 CELERY_TASK_RESULT_EXPIRES = 1200 # celery任务执行结果的超时时间，我的任务都不需要返回结果,只需要正确执行就行
