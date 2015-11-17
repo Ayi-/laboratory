@@ -61,3 +61,14 @@ class IsAdmin(permissions.BasePermission):
                 return request.user.is_staff or request.user.permission.code == 1
             except AttributeError:
                 return False
+
+
+def adminPermission(user):
+    """
+    用于视图验证管理员权限
+    :param user:
+    :return:
+    """
+    if user.is_staff or user.permission_id == 1:
+        return True
+    return False

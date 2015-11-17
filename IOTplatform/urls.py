@@ -16,16 +16,18 @@ Including another URLconf
 """
 
 from django.conf.urls import include, url, patterns
-from django.contrib import admin, auth
-from django.contrib.auth.decorators import login_required
+from django.contrib import admin
+from django.contrib.auth.decorators import login_required, user_passes_test
+from django.contrib.auth.models import AnonymousUser
+
 from django.views.decorators.csrf import csrf_exempt
-from rest_framework.urlpatterns import format_suffix_patterns
-from app.models import EquipStateLast
+from app.decorator import loginout_required
+
 from app.views import OrderListJson, UserViewSet, GroupViewSet, AppUserViewSet, EquipmentViewSet, PermissionViewSet, \
     Index, \
-    profile, equip, EquipmentTempleteView, AddEquip, PositionViewSet, EquipStateLastViewSet, Status
+    profile, equip, EquipmentTempleteView, AddEquip, PositionViewSet, EquipStateLastViewSet, Status, Register
 from rest_framework import routers
-from app import views
+
 
 router = routers.DefaultRouter()
 router.register(r'users', UserViewSet, base_name='user')
@@ -37,6 +39,9 @@ router.register(r'position', PositionViewSet)
 router.register(r'equipmenttemp', EquipmentTempleteView, base_name='equipmenttemp')
 router.register(r'equipstatelast',EquipStateLastViewSet)
 
+
+
+
 urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
 
@@ -46,6 +51,7 @@ urlpatterns += patterns('app.views',
                         url(r'^$', Status.as_view(), name='status'),
                         url(r'^index/$', login_required(Index.as_view()), name='index'),  # 主页
                         url(r'^login/$', 'loginApp', name='login'),  # 登陆
+                        url(r'^register/$',loginout_required(Register.as_view()), name='register'),  # 注册
                         url(r'^login4/$', 'login4App', name='login4'),  # APP登陆
                         url(r'^logout/$', 'logoutApp', name='logout'),  # 注销
                         url(r'^app_data/$', 'app_data', name='app_data'),  # 获取数据
@@ -65,3 +71,5 @@ urlpatterns += patterns('app.views',
                         url(r'^api/', include(router.urls)),
                         url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
                         )
+
+

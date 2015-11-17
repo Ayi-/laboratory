@@ -24,7 +24,10 @@ def laboratory(socket, address):
         describe=Equipment.objects.get(id=data[0]).describe.split('|')
         eq_data=[]
 
-        update_laboratory_state.delay(int(data[1])+int(data[2]))
+        if data[0]== '1':
+            update_laboratory_state.delay(int(data[1])+int(data[2]))
+        else:
+            update_laboratory_state.delay(0)
         for i in range(len(describe)):
             eq_data.append('{0}:{1:<6}'.format(describe[i],data[i+1]))
         EquipStateAll.objects.create(equip_id=data[0], data='|'.join(eq_data))

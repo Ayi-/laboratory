@@ -1,5 +1,3 @@
-{% include 'message.html' %}
-
 <!DOCTYPE html>
 <html lang="en">
 
@@ -11,7 +9,7 @@
     <meta name="description" content="">
     <meta name="author" content="">
 
-    <title>登陆</title>
+    <title>注册</title>
 
     <!-- Bootstrap Core CSS -->
     <link href="{{ static("css/bootstrap.min.css") }}" rel="stylesheet">
@@ -32,54 +30,46 @@
 </head>
 
 <body>
-<div style="position: fixed;bottom: 24px;display: block;z-index:10;">
-    {% for name,message in login_form.errors.items() %}
+<div style="position: fixed;bottom: 5px;display: block;z-index:5;">
+    {% for name,message in form.errors.items() %}
 
         <div class="alert alert-danger hidden-sm hidden-xs" role="alert">
 
-        <button type="button" class="close" data-dismiss="alert">
-            <i class="ace-icon fa fa-times">
-                <span aria-hidden="true"></span>
-            </i>
-        </button>
-<span class="glyphicon glyphicon-exclamation-sign"></span>
-{{ message|striptags }}
+            <button type="button" class="close" data-dismiss="alert">
+                <i class="ace-icon fa fa-times">
+                    <span aria-hidden="true"></span>
+                </i>
+            </button>
+            <span class="glyphicon glyphicon-exclamation-sign"></span>
+            {{ message|striptags }}
 
-</div>
-{% endfor %}
+        </div>
+    {% endfor %}
 </div>
 <div class="container">
     <div class="row">
         <div class="col-md-4 col-md-offset-4">
             <div class="login-panel panel panel-default">
                 <div class="panel-heading">
-                    <h3 class="panel-title">登陆</h3>
+                    <h3 class="panel-title">注册</h3>
                 </div>
                 <div class="panel-body">
                     <form role="form" method="post">
                         <fieldset>
+                            <div style="display:none">
+                                <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+                            </div>
+                            {% for field in form %}
 
-                            <div class="form-group">
-                                <div style="display:none">
-                                    <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+                                <div class="form-group" {% if  field.label == '申请码' %}style="display: none"{% endif %}>
+                                    <label>{{ field.label }}</label>
+                                    {{ field }}
                                 </div>
 
-                                <input autofocus  class="form-control" placeholder="请输入用户名"
-                                       name="username" type="text" value="">
-                            </div>
-                            <div class="form-group">
-
-                                <input class="form-control" placeholder="请输入密码" name="password" type="password"
-                                       >
-                            </div>
-                            <div class="checkbox">
-                                <label>
-                                    <input name="remember" type="checkbox" value="Remember Me">记住我
-                                </label>
-                            </div>
+                            {% endfor %}
                             <!-- Change this to a button or input when using this as a form -->
-                            <button type="submit" class="btn btn-lg btn-info btn-block">登陆</button>
-                            <a href="{{ url('register') }}"  class="btn btn-lg btn-success btn-block">注册</a>
+                            <button type="submit" class="btn btn-lg btn-success btn-block">注册</button>
+                        <a href="{{ url('login') }}" class="btn btn-lg btn-info btn-block">返回</a>
                         </fieldset>
                     </form>
                 </div>
@@ -108,11 +98,22 @@
 
         //$(this).alert('close');
         $(this).remove("*");
-    });
-    // 经过就关闭
-    $("[role='alert']").hover(function(){
+    }).hover(function () {
         $(this).remove("*");
     });
+    // 经过就关闭
+    $('select').change(function () {
+        var p1 = $(this).children('option:selected').val();
+        if(p1 == 1)
+        {
+            $('#id_Invite').parent().removeAttr('style');
+        }
+        else
+        {
+            $('#id_Invite').parent().attr('style','display:none');
+
+        }
+    })
 
 </script>
 

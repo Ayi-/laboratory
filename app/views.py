@@ -13,8 +13,8 @@ from django.contrib.messages import get_messages
 
 from django.views.generic import TemplateView, DetailView, FormView, UpdateView, CreateView
 from django.contrib.auth import login, authenticate, logout
-from django.contrib.auth.decorators import login_required
-from django.contrib.auth.models import User, Group
+from django.contrib.auth.decorators import login_required, user_passes_test
+from django.contrib.auth.models import User, Group, AnonymousUser
 from django.core.urlresolvers import reverse_lazy  # 使用_lazy代替reverse,
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
@@ -22,13 +22,14 @@ from django.http import HttpResponse
 from django_datatables_view.base_datatable_view import BaseDatatableView
 from django_datatables_view.mixins import LazyEncoder
 from rest_framework.permissions import IsAuthenticated
+from app.decorator import loginout_required
 
-from app.permissions import IsAdminOrReadOnly, IsAdmin
+from app.permissions import IsAdminOrReadOnly, IsAdmin, adminPermission
 from app.modelchoice import modelchoice
-from app.forms import LoginForm, EquipmentForm
+from app.forms import LoginForm, EquipmentForm, RegisterForm
 from app.models import User as AppUser, Equipment, Permission, EquipStateLast, EquipStateAll, Position, LaboratoryState
 from app.serializers import UserSerializer, GroupSerializer, AppUserSerializer, EquipSerializer, PermissionSerializer, \
-    EquipTempSerializer, MessageSer, EquipStateLastSerializer, PositionSerializer
+    EquipTempSerializer, EquipStateLastSerializer, PositionSerializer
 
 from rest_framework.response import Response
 from rest_framework import permissions
@@ -58,15 +59,9 @@ logger = logging.getLogger(__name__)  # 这里用__name__通用,自动检测.
 #     #    for j in range(2):
 #     #        data.append(qe.filter(rent_flag=tf[i], maintenance_flag=tf[j]).count())
 #     return render_to_response('index.html', locals())
-def adminPermission(user):
-    """
-    用于验证管理员权限
-    :param user:
-    :return:
-    """
-    if user.is_staff or user.permission_id == 1:
-        return True
-    return False
+
+
+
 
 class Index(TemplateView):
     # queryset = None
@@ -97,7 +92,7 @@ class Status(TemplateView):
         context['data'] = qe
         return context
 
-
+@loginout_required
 def loginApp(request):
     """
     登陆操作，成功后更新时间
@@ -118,6 +113,26 @@ def loginApp(request):
     else:
         login_form = LoginForm()
     return render(request, 'login.html', locals())
+
+
+class Register(CreateView):
+    template_name = 'register.html'
+    form_class = RegisterForm
+    success_url = reverse_lazy('login')
+
+    # def dispatch(self, request, *args, **kwargs):
+    #     if not AnonymousUser.__instancecheck__(request.user):
+    #         return redirect('/index')
+    #     return super(Register,self).dispatch(request, *args, **kwargs)
+
+    def form_valid(self, form):
+        # This method is called when valid form data has been POSTed.
+        # It should return an HttpResponse.
+        # form.send_email()
+        messages.success(self.request, u'注册成功！')
+        return super(Register, self).form_valid(form)
+
+
 
 
 def login4App(request):
@@ -465,3 +480,5 @@ class EquipStateLastViewSet(viewsets.ModelViewSet):
 
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
+
+

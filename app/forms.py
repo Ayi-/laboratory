@@ -13,8 +13,8 @@ reload(sys)
 sys.setdefaultencoding('utf8')
 from django import forms
 from django.forms import ModelForm
-from django.forms.widgets import Input, TextInput, Textarea
-from app.models import User, Equipment
+from django.forms.widgets import Input, TextInput, Textarea, Select, PasswordInput, EmailInput, HiddenInput
+from app.models import User, Equipment, Permission
 from django.utils.translation import ugettext_lazy as _
 
 
@@ -32,7 +32,6 @@ class LoginForm(forms.Form):
         cleaned_data = super(LoginForm, self).clean()
         cleaned_username = cleaned_data.get("username", "")
         cleaned_password = cleaned_data.get("password", "")
-        print cleaned_username
         try:
             user = User.objects.get(username=cleaned_username)
         except User.DoesNotExist:
@@ -93,12 +92,81 @@ class EquipmentForm(ModelForm):
         }
         error_messages = {
             'name': {
-                'max_length': _("设备名太长"),
+                'max_length': _('设备名太长'),
             },
         }
 
     def clean(self):
         cleaned_data = super(EquipmentForm, self).clean()
+        # cleaned_username = cleaned_data.get("username","")
+        # cleaned_password = cleaned_data.get("password","")
+        return cleaned_data
+
+
+class RegisterForm(ModelForm):
+    """
+    用户注册模块
+    """
+    permission = forms.ModelChoiceField(widget=Select(attrs={'class': "form-control"}),
+                                        queryset=Permission.objects.all(),
+                                        label=u'权限',
+                                        initial=2)
+    password2 = forms.CharField(widget=PasswordInput(attrs={'class': "form-control",
+                                                            'placeholder': u'再次输入密码'}),
+                                label=u'验证密码',
+                                error_messages={'max_length': _(u'验证密码太长，不得超过30个字符'),
+                                                'required': _(u'验证密码是必填项！'), })
+    Invite = forms.CharField(widget=Input(attrs={'class': "form-control",
+                                                       'placeholder': u'请输入申请码'}),
+                             label=u'申请码',
+                             required=False,
+                             error_messages={'invalid': _(u'申请码错误！')})
+
+    class Meta:
+        model = User
+        fields = ('username', 'password', 'password2', 'full_name', 'email', 'permission')
+
+        widgets = {
+            'username': Input(attrs={'class': "form-control", 'placeholder': u'请输入用户名'}),
+            'password': PasswordInput(attrs={'class': "form-control", 'placeholder': u'请输入密码'}),
+
+            'full_name': Input(attrs={'class': "form-control", 'placeholder': u'请输入昵称'}),
+            'email': EmailInput(attrs={
+                'class': "form-control",
+                'placeholder': u'请输入您的邮箱'}),
+
+        }
+        labels = {
+            'permission': _(u'权限'),
+        }
+        help_texts = {
+            'username': _(u'登陆的用户名'),
+        }
+        error_messages = {
+            'username': {
+                'max_length': _(u'用户名太长'),
+                'required': _(u'用户名是必填项！'),
+
+            },
+            'password': {
+                'max_length': _(u'密码太长，不得超过30个字符'),
+                'required': _(u'密码是必填项！'),
+            },
+            'email': {
+                'max_length': _(u'电子邮箱太长，不得超过30个字符'),
+                'required': _(u'电子邮箱是必填项！'),
+                'invalid': u'邮箱格式错误',
+            },
+        }
+
+    def clean(self):
+        cleaned_data = super(RegisterForm, self).clean()
+        print cleaned_data
+        if cleaned_data.get('permission','').code ==1:
+            if cleaned_data.get('Invite','') != 'admin':
+                self.add_error('Invite', _(u'申请码错误！'))
+        if cleaned_data.get("password","") != cleaned_data.get("password2",""):
+            self.add_error('password', _(u'验证密码不同！'))
         # cleaned_username = cleaned_data.get("username","")
         # cleaned_password = cleaned_data.get("password","")
         return cleaned_data

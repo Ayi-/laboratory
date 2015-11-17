@@ -11,6 +11,7 @@ from __future__ import unicode_literals
 import datetime
 
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, User as aUser
+from django.core import validators
 
 from django.db import models
 
@@ -37,7 +38,7 @@ class Permission(models.Model):
         verbose_name_plural = verbose_name
 
     def __str__(self):
-        return '%s %d' % (self.name, self.code)
+        return '%s' % (self.name)
 
 
 # @python_2_unicode_compatible
@@ -102,13 +103,22 @@ class Position(models.Model):
 
 @python_2_unicode_compatible
 class User(AbstractBaseUser):
-    username = models.CharField(_(u'用户名'), max_length=30, unique=True, default=None)
+    username = models.CharField(_(u'用户名'), max_length=30, unique=True, default=None,
+                                help_text=_(u'用户名只允许不超过30个字符的字母、数字、下划线组合'),
+                                validators=[
+                                    validators.RegexValidator(r'^[\w_]+$',
+                                                              _(u'用户名只允许不超过30个字符的字母、数字、下划线组合'),
+                                                              'invalid'),
+                                ],
+                                error_messages={
+                                    'unique': _(u"用户已存在")
+                                })
     full_name = models.CharField(_(u'昵称'), max_length=30, blank=True)
-    email = models.EmailField(_(u'电子邮箱'), max_length=30, blank=True)
+    email = models.EmailField(_(u'电子邮箱'), max_length=30)
 
     # 权限
     # 2是用户级别
-    permission = models.ForeignKey(Permission, default=2, blank=True, null=True, on_delete=models.SET_NULL,
+    permission = models.ForeignKey(Permission, default=2, blank=False, null=False,on_delete=models.DO_NOTHING,
                                    related_name='user', verbose_name=u'权限')
     position = models.ForeignKey(Position, blank=True, null=True, on_delete=models.SET_NULL, related_name='user',
                                  verbose_name=u'位置')
@@ -176,7 +186,7 @@ class AbstractBaseEquipment(models.Model):
 
     price = models.IntegerField(_(u'设备价格(元)'), default=0)
     work_flag = models.IntegerField(_(u'工作标志'), default=0)
-    describe = models.CharField(_(u'设备描述'),max_length=255,default="",
+    describe = models.CharField(_(u'设备描述'), max_length=255, default="",
                                 help_text=u'数据显示样式，如填写"数据",最终显示"数据:xxx"')
     load_date = models.DateTimeField(_(u'登记日期'), default=timezone.now)
     equip_sd_argument = models.TextField(_(u'设备描述'))
@@ -238,7 +248,6 @@ class Equipment(AbstractBaseEquipment):
 
 
 class EquipStateManeger(models.Manager):
-
     def create(self, **kwargs):
         """
         Creates a new object with the given kwargs, saving it to the database
@@ -252,7 +261,7 @@ class EquipStateManeger(models.Manager):
 
         # 更新最近数据
         EquipStateLast.objects.update_or_create(equip_id=obj.equip_id,
-                                                defaults={'data':obj.data,'state_date':obj.state_date})
+                                                defaults={'data': obj.data, 'state_date': obj.state_date})
 
         # 更新设备状态
         Equipment.objects.filter(id=obj.equip_id).update(work_flag=1)
@@ -271,6 +280,7 @@ class AbstractEquipState(models.Model):
         abstract = True
 
 
+@python_2_unicode_compatible
 class LaboratoryState(models.Model):
     '''
     用于存放当前状态数据，每10分钟更新一次
@@ -286,6 +296,8 @@ class LaboratoryState(models.Model):
         verbose_name = u'实验室最新状态表'
         verbose_name_plural = verbose_name
 
+    def __str__(self):
+        return self.update_time
 
 @python_2_unicode_compatible
 class EquipStateAll(AbstractEquipState):
@@ -295,6 +307,7 @@ class EquipStateAll(AbstractEquipState):
     equip = models.ForeignKey(Equipment, default=None, on_delete=models.DO_NOTHING, verbose_name=u'设备号',
                               related_name='equip_state_all')
     objects = EquipStateManeger()
+
     class Meta:
         db_table = 'equip_state_all'
         verbose_name = u'设备状态表'
@@ -326,7 +339,7 @@ class EquipStateLast(AbstractEquipState):
         verbose_name_plural = verbose_name
 
     def __str__(self):
-        return self.equip.name
+        return '%s:%s' %(self.equip.name,timezone.localtime(self.state_date).strftime('%Y-%m-%d %H:%M:%S'))
 
     def get_dict(self):
         Dict = self.__dict__
