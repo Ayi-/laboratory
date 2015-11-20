@@ -61,7 +61,7 @@
         }).on('click', 'button', function () {
             {#显示模型框#}
             model_id = oTable.cell($(this).parents().parents('tr').children('td').eq(3)).data();
-            oTable = $('#example2').DataTable({
+            oTable_2 = $('#example2').DataTable({
                 serverSide: true,
                 processing: true,
                 "stateSave": true,//状态保存
@@ -87,7 +87,9 @@
                         'model_id': model_id
                     }
                 },
-                "PaginationType": "full_numbers",
+                //"PaginationType": "full_numbers",
+                //设置跳页
+                "pagingType":"input",
                 //"order": [[0, "asc"]],
                 {#                        行设置#}
                 "createdRow": function (row, data, dataIndex) {
@@ -134,8 +136,8 @@
                 dom: 'R<"row"<"col-sm-3" l>' +
                 '<"col-sm-3" C>>' +
                 '<"row" <"col-sm-12" tr>>' +
-                '<"row"<"col-sm-6" i>' +
-                '<"col-sm-6" p>>',
+                '<"row"<"col-sm-5" i>' +
+                '<"col-sm-7" p>>',
                 {# 定义显示列表 #}
                 colVis: {
                     activate: "mouseover",
@@ -155,7 +157,7 @@
 
                     // Apply the search
                     {# 应用搜索 #}
-                    oTable.columns().every(function () {
+                    oTable_2.columns().every(function () {
                         var column = this;
 
                         $('input', this.footer()).keyup(function (e) {
@@ -182,8 +184,8 @@
                     .modal('show')
                     {#模态框隐藏事件#}
                     .on('hidden.bs.modal', function () {
-                        if (oTable != undefined) {
-                            oTable.destroy();
+                        if (oTable_2 != undefined) {
+                            oTable_2.destroy();
                         }
 
                         {#关闭模态框隐藏事件监听动作,避免重复调用#}

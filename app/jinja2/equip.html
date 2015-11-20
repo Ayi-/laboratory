@@ -55,6 +55,7 @@
     {#<script src="{{ static('js/dataTables.colReorder.js') }}"></script>#}
     <script src="{{ static('js/dataTables.responsive.js') }}"></script>
     <script src="{{ static('js/dataTables.colVis.js') }}"></script>
+    <script src="{{ static('js/dataTables.input.js') }}"></script>
 
     <script type="text/javascript" src="{{ static('js/bootstrap-datetimepicker.min.js') }}"></script>
     <script type="text/javascript" src="{{ static('js/locales/bootstrap-datetimepicker.zh-CN.js') }}"
@@ -105,7 +106,9 @@
                                 "type": 'POST'
 
                             },
-                            "PaginationType": "full_numbers",
+                            //"PaginationType": "full_numbers",
+                            //设置跳页
+                             "pagingType":"input",
                             "order": order,
                             {#                        行设置#}
                             "createdRow": function (row, data, dataIndex) {
@@ -229,8 +232,8 @@
                             dom: 'R<"row"<"col-sm-3" l>' +
                             '<"col-sm-3" C>>' +
                             '<"row" <"col-sm-12" tr>>' +
-                            '<"row"<"col-sm-6" i>' +
-                            '<"col-sm-6" p>>',
+                            '<"row"<"col-sm-5" i>' +
+                            '<"col-sm-7" p>>',
                             {# 定义显示列表 #}
                             colVis: {
                                 activate: "mouseover",
