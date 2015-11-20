@@ -7,14 +7,6 @@
     <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-hidden="true">
         <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content">
-
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
-                            aria-hidden="true">&times;</span></button>
-                    <h4 class="modal-title">控制界面</h4>
-                </div>
-
-
                 <div class="modal-body">
                     <div class="container-fluid">
                         <div class="row">
@@ -43,9 +35,6 @@
                         </div>
                     </div>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
-                </div>
             </div>
 
         </div>
@@ -61,116 +50,6 @@
         }).on('click', 'button', function () {
             {#显示模型框#}
             model_id = oTable.cell($(this).parents().parents('tr').children('td').eq(3)).data();
-            oTable_2 = $('#example2').DataTable({
-                serverSide: true,
-                processing: true,
-                "stateSave": true,//状态保存
-                "deferRender": true,//延迟渲染
-                //设置滚动条
-                //'scrollY': 768,
-                //"scrollCollapse": true,
-                //"scrollX":true,
-                autoWidth: true,
-                fixedHeader: {
-                    header: true,
-                    footer: true
-                },
-                responsive: true,
-                "language": {
-                    "url": "{{ static('dataTables.chinese.lang') }}"
-                },
-                "ajax": {
-                    "url": "{{ url('ajax-dict')  }} ",
-                    "type": 'POST',
-                    'data': {
-                        'model': 'eqstate',
-                        'model_id': model_id
-                    }
-                },
-                //"PaginationType": "full_numbers",
-                //设置跳页
-                "pagingType":"input",
-                //"order": [[0, "asc"]],
-                {#                        行设置#}
-                "createdRow": function (row, data, dataIndex) {
-
-                },
-                {#列设置#}
-                "columnDefs": [
-                    {# 参数宽度固定 #}
-                    //{"width": "20px", "targets": ['all']},
-                    {#                            {"heigh": "5%", "targets": '_all'},#}
-                    {#取消控制栏的搜索和排序#}
-                    {
-                        "searchable": false,
-                        "orderable": false,
-                        "targets": -1
-                    },
-                    {#隐藏#}
-                    {#                            {#}
-                    {#                                "targets": [10,11],#}
-                    {#                                "visible": false,#}
-                    {#                                "searchable": false#}
-                    {##}
-                    {#                            },#}
-                    {# 添加控制按钮 #}
-                    {
-                        "targets": -1,
-                        "data": null,
-                        "defaultContent": "<button id='test1' class='btn btn-primary''data-toggle='modal' data-target='#myModal'  >详情</button>"
-                    },
-                    {#居中显示#}
-                    {className: "textCenter", "targets": ''},
-                    {# 创建单元时回调函数 #}
-                    {
-                        "targets": [-4],
-                        {#                                "targets": [7, 8],#}
-                        "createdCell": function (td, cellData, rowData, row, col) {
-                        }
-                    }{#列设置回调结束#}
-                ], {#列参数设置结束#}
-                {# 表格数据 #}
-                'columns': {{ columns|safe }},
-                //dom: 'Rlfrtip',
-                {# 定义DOM,表格底部样式 #}
-                dom: 'R<"row"<"col-sm-3" l>' +
-                '<"col-sm-3" C>>' +
-                '<"row" <"col-sm-12" tr>>' +
-                '<"row"<"col-sm-5" i>' +
-                '<"col-sm-7" p>>',
-                {# 定义显示列表 #}
-                colVis: {
-                    activate: "mouseover",
-                    buttonText: "显示列表",
-                    "align": "left"
-                },
-                {# 设置按下回车才搜索 #}
-                "initComplete": function () {
-                    {# 应用固定表格头部设置 #}
-
-                    {# 为每一行添加搜索 #}
-                    // Setup - add a text input to each footer cell
-                    $('#example2 tfoot th').each(function () {
-                        //var title = $('#example thead th').eq($(this).index()).text();
-                        $(this).html('<input type="text" placeholder="搜索" />');
-                    });
-
-                    // Apply the search
-                    {# 应用搜索 #}
-                    oTable_2.columns().every(function () {
-                        var column = this;
-
-                        $('input', this.footer()).keyup(function (e) {
-                            if (e.keyCode == 13) {
-                                column
-                                        .search(this.value)
-                                        .draw();
-                            }
-
-                        });
-                    });
-                }
-            });// end of datatables;
             {#            id = oTable.cell($(this).parents().parents('tr').children('td').eq(0)).data();#}
             {#模态框手动打开#}
             $('#myModal').on('shown.bs.modal', function () {
@@ -179,20 +58,117 @@
                 {#避免重复响应事件#}
                 $(this).off('shown.bs.modal');
 
+                oTable_2 = $('#example2').DataTable({
+                    serverSide: true,
+                    processing: true,
+                    "stateSave": true,//状态保存
+                    "deferRender": true,//延迟渲染
+                    //设置滚动条
+                    'scrollY': $(document.body).height() - 250 + 'px',
+                    //"scrollCollapse": true,
+                    //"scrollX":true,
+                    autoWidth: true,
+                    fixedHeader: {
+                        header: true,
+                        footer: true
+                    },
+                    responsive: true,
+                    "language": {
+                        "url": "{{ static('dataTables.chinese.lang') }}"
+                    },
+                    "ajax": {
+                        "url": "{{ url('ajax-dict')  }} ",
+                        "type": 'POST',
+                        'data': {
+                            'model': 'eqstate',
+                            'model_id': model_id
+                        }
+                    },
+                    //"PaginationType": "full_numbers",
+                    //设置跳页
+                    "pagingType": "input",
+                    //"order": [[0, "asc"]],
+                    {#列设置#}
+                    "columnDefs": [
+                        {# 参数宽度固定 #}
+                        {"width": "15%", "targets": [0, 3]},
+                        {#                            {"heigh": "5%", "targets": '_all'},#}
+                        {#隐藏#}
+                        {#                            {#}
+                        {#                                "targets": [10,11],#}
+                        {#                                "visible": false,#}
+                        {#                                "searchable": false#}
+                        {##}
+                        {#                            },#}
+                        {#居中显示#}
+                        {'className': "textCenter", "targets": [0, 1, 2, 3]}
+
+                    ], {#列参数设置结束#}
+                    {# 表格数据 #}
+                    'columns': {{ columns|safe }},
+                    //dom: 'Rlfrtip',
+                    {# 定义DOM,表格底部样式 #}
+                    dom: 'R<<"col-sm-3" l>' +
+                    '<"col-sm-8" C>' +
+                    '<"col-sm-1" B>>' +
+                    '<"row" <"col-sm-12" tr>>' +
+                    '<"row"<"col-sm-5" i>' +
+                    '<"col-sm-7" p>>',
+                    {#                    按钮设置#}
+                    buttons: [
+                        {
+                            text: '关闭',
+                            action: function (e, dt, node, config) {
+
+
+                                $('#myModal').modal('hide');
+
+                            }
+                        }
+                    ],
+                    {# 定义显示列表 #}
+                    colVis: {
+                        activate: "mouseover",
+                        buttonText: "显示列表",
+                        "align": "left"
+                    },
+                    {# 设置按下回车才搜索 #}
+                    "initComplete": function () {
+                        {# 为每一行添加搜索 #}
+                        // Setup - add a text input to each footer cell
+                        $('#example2 tfoot th').each(function () {
+                            //var title = $('#example thead th').eq($(this).index()).text();
+                            $(this).html('<input type="text" placeholder="搜索" />');
+                        });
+
+                        // Apply the search
+                        {# 应用搜索 #}
+                        oTable_2.columns().every(function () {
+                            var column = this;
+
+                            $('input', this.footer()).keyup(function (e) {
+                                if (e.keyCode == 13) {
+                                    column
+                                            .search(this.value)
+                                            .draw();
+                                }
+
+                            });
+                        });
+                    }
+                });// end of datatables;
             })/*显示模态框结束*/
                     {#模态框手动打开#}
                     .modal('show')
                     {#模态框隐藏事件#}
                     .on('hidden.bs.modal', function () {
-                        if (oTable_2 != undefined) {
-                            oTable_2.destroy();
-                        }
-
+                        oTable_2.destroy();
                         {#关闭模态框隐藏事件监听动作,避免重复调用#}
                         $(this).off('hidden.bs.modal');
                     });
 
         });//表格点击事件结束
+        {#                                 应用固定表格头部设置 #}
 
 
     {% endblock modalshow %}

@@ -10,12 +10,20 @@
     -->
     <!-- DataTables CSS -->
     {#    <link type="text/css" href="{{ static("css/jquery.dataTables.css") }}" rel="stylesheet">#}
-
+{#    bootstrap样式#}
     <link type="text/css" href="{{ static('css/dataTables.bootstrap.css') }}" rel="stylesheet">
+{#    修复表头#}
     <link type="text/css" href="{{ static('css/dataTables.fixedHeader.css') }}" rel="stylesheet">
+{#    自动调整列#}
     <link type="text/css" href="{{ static('css/dataTables.responsive.css') }}" rel="stylesheet">
+{#    自定义显示列#}
     <link type="text/css" href="{{ static('css/dataTables.colVis.css') }}" rel="stylesheet">
+    {#自定义按钮支持#}
+    <link type="text/css" href="{{ static('css/buttons.bootstrap.min.css') }}" rel="stylesheet">
+
+{#    日期部件支持#}
     <link type="text/css" href="{{ static('css/bootstrap-datetimepicker.min.css') }}" rel="stylesheet">
+
     {#设置表格列可以移动#}
     {#    <link type="text/css" href="{{ static('css/dataTables.colReorder.css') }}" rel="stylesheet">#}
 
@@ -45,18 +53,25 @@
     <!-- Custom Theme JavaScript -->
 
     <!-- DataTables JavaScript -->
-
+{#    datatables支持#}
     <script type="text/javascript" charset="utf8" src="{{ static('js/jquery.dataTables.min.js') }}"></script>
+{#    bootstrap样式支持#}
     <script type="text/javascript" charset="utf8" src="{{ static('js/dataTables.bootstrap.min.js') }}"></script>
-    <script src="{{ static('js/dataTables.keyTable.js') }}"></script>
+{#    修复表头#}
     <script src="{{ static('js/dataTables.fixedHeader.js') }}"></script>
 
     {#设置表格列可以移动#}
     {#<script src="{{ static('js/dataTables.colReorder.js') }}"></script>#}
+{#    自动调整列格式#}
     <script src="{{ static('js/dataTables.responsive.js') }}"></script>
+{#    自定义显示列#}
     <script src="{{ static('js/dataTables.colVis.js') }}"></script>
+{#    跳转页面支持#}
     <script src="{{ static('js/dataTables.input.js') }}"></script>
-
+{#    自定义按钮支持#}
+<script src="{{ static('js/dataTables.buttons.min.js') }}"></script>
+    <script src="{{ static('js/buttons.bootstrap.min.js') }}"></script>
+    {#日期部件支持#}
     <script type="text/javascript" src="{{ static('js/bootstrap-datetimepicker.min.js') }}"></script>
     <script type="text/javascript" src="{{ static('js/locales/bootstrap-datetimepicker.zh-CN.js') }}"
             charset="UTF-8"></script>
@@ -243,7 +258,7 @@
                             {# 设置按下回车才搜索 #}
                             "initComplete": function () {
                                 {# 应用固定表格头部设置 #}
-{#                                new $.fn.dataTable.FixedHeader(oTable);#}
+                                new $.fn.dataTable.FixedHeader(oTable);
 {#                                $('.FixedHeader_Cloned').remove();#}
                                 {# 为每一行添加搜索 #}
                                 // Setup - add a text input to each footer cell
