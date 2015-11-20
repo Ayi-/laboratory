@@ -139,7 +139,9 @@
 			});
 
 			$(nInput).keyup(function (e) {
-				// 38 = up arrow, 39 = right arrow
+				//修改设置为方向键或者回车才跳页
+				if (e.keyCode === 13 || e.which === 38 || e.which === 39||e.which === 37 || e.which === 40) {
+					// 38 = up arrow, 39 = right arrow
 				if (e.which === 38 || e.which === 39) {
 					this.value++;
 				}
@@ -149,6 +151,7 @@
 				}
 
 				if (this.value === '' || this.value.match(/[^0-9]/)) {
+
 					/* Nothing entered or non-numeric character */
 					this.value = this.value.replace(/[^\d]/g, ''); // don't even allow anything but digits
 					return;
@@ -164,6 +167,7 @@
 
 				oSettings._iDisplayStart = iNewStart;
 				fnCallbackDraw(oSettings);
+			}
 			});
 
 			// Take the brutal approach to cancelling text selection.
