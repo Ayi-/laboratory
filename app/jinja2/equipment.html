@@ -17,38 +17,59 @@
                 <div class="modal-body">
                     <div class="container-fluid">
                         <div class="row">
-                            <div class="col-md-6 col-sm-6 col-lg-6">
-                                <div class="input-group">
+
+                            <div class="col-md-6 col-sm-6 col-lg-6 col-md-offset-0 col-lg-offset-0">
+                                <div class="input-group" style="padding-bottom: 10px">
                                     <input type="text" class="form-control" placeholder="例如关机:{poweroff:1}">
                                       <span class="input-group-btn">
 {#        <button class="btn btn-default" type="button" href="{{ url('sendcmd') }}">发送!</button>#}
-          <a type="button" class="btn btn-primary">发送控制命令</a>
-      </span>
+                                        <a type="button" class="btn btn-primary">发送控制命令</a>
+                                      </span>
                                 </div>
                                 <!-- /input-group -->
-                            </div>
-                            {% if  type == "equip" %}
-                                <div class="col-md-6 col-sm-6 col-lg-6">
-
-                                    <div id="modalMap" style="width: 100% ; height: 300px;"></div>
-                                </div>
-                                <div class="col-md-6 col-sm-6 col-lg-6">
-                                </div>
-                                <div class="col-md-6 col-sm-6 col-lg-6">
-                                    <div id="modalresult" style="width: 100% ; height: 200px;overflow: scroll">
-                                        <div class="alert alert-success">
-                                            <h4><i class="ace-icon fa fa-check green"></i>
-                                                显示导航路线
-                                            </h4></div>
+                                <form class="form-horizontal" role="form" action="" method="post">
+                                    <div style="display:none">
+                                        <input type="hidden" name="csrfmiddlewaretoken"
+                                               value="{{ csrf_token }}">
                                     </div>
+                                    {% for field in form %}
+                                        <div class="form-group">
+
+                                            <label class="col-sm-4 control-label">{{ field.label }}</label>
+
+                                            <div class="col-sm-8">
+                                                {{ field }}
+                                            </div>
+                                        </div>
+                                    {% endfor %}
+                                <div class="col-md-6 col-sm-6 col-lg-6 col-md-offset-4 col-lg-offset-4">
+                                    <button type="submit" class="btn btn-info" value="Update">更新
+                                    </button>
+                                    <button type="reset" class="btn btn-default">重置</button>
+                                    </div>
+                                </form>
+                            </div>
+
+                            <div class="col-md-6 col-sm-6 col-lg-6 ">
+                                <div id="modalMap" style="width: 100% ; height: 300px;"></div>
+                            </div>
+
+
+                            <div class="col-md-6 col-sm-6 col-lg-6 ">
+                                <div id="modalresult" style="width: 100% ; height: 200px;overflow: scroll">
+                                    <div class="alert alert-success">
+                                        <h4><i class="ace-icon fa fa-check green"></i>
+                                            显示导航路线
+                                        </h4></div>
                                 </div>
-                            {% endif %}
+                            </div>
+
                         </div>
                     </div>
                 </div>
                 <div class="modal-footer">
 
-                    <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+
                     <button id="delete_eq1" class="btn btn-danger">
                         删除该设备
                     </button>
@@ -98,7 +119,8 @@
 
         });
         $("#delete_eq2").on('click', function () {
-            $(this).attr({"disabled": "disabled"});
+            btn=$(this);
+            btn.attr({"disabled": "disabled"});
             $.ajax(this.value, {
                 type: 'DELETE',
                 beforeSend: function (xhr) {
@@ -109,7 +131,7 @@
                     $('#deleteModal').modal('hide');
                     $('#myModal').modal('hide');
                     oTable.ajax.reload(null, false);
-                    $(this).attr({"disabled": ""});
+                    btn.removeAttr('disabled');
 
                 }
             });
@@ -119,23 +141,29 @@
         {# 显示控制详细信息 #}
         $("#example").on('click', 'td', function () {
 
-            if (detailsFlag) {
-                $('div.innerDetails', $(this)).slideUp();
-                $('div.Details', $(this)).slideDown();
-                detailsFlag = false;
-            }
-            else {
-                $('div.innerDetails', $(this)).slideDown();
-                $('div.Details', $(this)).slideUp();
-                detailsFlag = true;
-
-            }
+{#            if (detailsFlag) {#}
+{#                $('div.innerDetails', $(this)).slideUp();#}
+{#                $('div.Details', $(this)).slideDown();#}
+{#                detailsFlag = false;#}
+{#            }#}
+{#            else {#}
+{#                $('div.innerDetails', $(this)).slideDown();#}
+{#                $('div.Details', $(this)).slideUp();#}
+{#                detailsFlag = true;#}
+{##}
+{#            }#}
             //显示详细信息结束
         }).on('click', 'button', function () {
             {#显示模型框#}
             {#获取经纬度#}
 
             id = oTable.cell($(this).parents().parents('tr').children('td').eq(0)).data();
+
+                oTable.cell($(this).parents().parents('tr').find("td").each(function (index) {
+                    //console.log($(this).text());
+                    //console.log(index);
+                    $('.form-control').eq(index+1).val($(this).text());
+                }));
             {#                            gps_longitude = oTable.cell($(this).parents().parents('tr').children('td').eq(10)).data();#}
             {#                            gps_latitude = oTable.cell($(this).parents().parents('tr').children('td').eq(11)).data();#}
             {#创建地图坐标点#}
@@ -246,27 +274,27 @@
         //设置覆盖物
         function overlay_style(e) {
             $.getJSON(
-                    "{{ url('equipment-list') }}" + id, {}, function (data) {
+                    "{{ url('equipment-list') }}" + id+'/', {}, function (data) {
                         {#                                    var circle = new BMap.Circle(startPoint, data.raidus);#}
                         {#                                    modalMap.addOverlay(circle);            //增加圆#}
                         if (data.id != '')
-                        $.getJSON(
-                                "{{ url('position-list') }}" + data.position, {}, function (data) {
+                            $.getJSON(
+                                    "{{ url('position-list') }}" + data.position+'/', {}, function (data) {
 
-                                    if (data.id != '') {
-                                        gps_longitude = data.gps_longitude;
-                                        gps_latitude = data.gps_latitude;
-                                        {#创建地图坐标点#}
-                                        startPoint = new BMap.Point(gps_longitude, gps_latitude);
+                                        if (data.id != '') {
+                                            gps_longitude = data.gps_longitude;
+                                            gps_latitude = data.gps_latitude;
+                                            {#创建地图坐标点#}
+                                            startPoint = new BMap.Point(gps_longitude, gps_latitude);
 
-                                        {#                                        点击的坐标增加跳动显示#}
-                                        modelMarker = new BMap.Marker(startPoint);
-                                        modalMap.addOverlay(modelMarker);  // 将标注添加到地图中
-                                        modalMap.panTo(startPoint);
-                                        modelMarker.setAnimation(BMAP_ANIMATION_BOUNCE); //跳动的动画
+                                            {#                                        点击的坐标增加跳动显示#}
+                                            modelMarker = new BMap.Marker(startPoint);
+                                            modalMap.addOverlay(modelMarker);  // 将标注添加到地图中
+                                            modalMap.panTo(startPoint);
+                                            modelMarker.setAnimation(BMAP_ANIMATION_BOUNCE); //跳动的动画
 
-                                    }//function end
-                                });//end get position
+                                        }//function end
+                                    });//end get position
                     }
             );// end get position id
         }

@@ -13,7 +13,8 @@ reload(sys)
 sys.setdefaultencoding('utf8')
 from django import forms
 from django.forms import ModelForm
-from django.forms.widgets import Input, TextInput, Textarea, Select, PasswordInput, EmailInput, HiddenInput
+from django.forms.widgets import Input, TextInput, Textarea, Select, PasswordInput, EmailInput, HiddenInput, \
+    DateTimeInput
 from app.models import User, Equipment, Permission
 from django.utils.translation import ugettext_lazy as _
 
@@ -71,6 +72,8 @@ class LoginForm(forms.Form):
 
 
 class EquipmentForm(ModelForm):
+
+
     class Meta:
         model = Equipment
         fields = ('name', 'typecode', 'price', 'describe', 'equip_sd_argument')
@@ -100,6 +103,43 @@ class EquipmentForm(ModelForm):
         cleaned_data = super(EquipmentForm, self).clean()
         # cleaned_username = cleaned_data.get("username","")
         # cleaned_password = cleaned_data.get("password","")
+        return cleaned_data
+
+
+class UpdateEquip(ModelForm):
+    '''
+    更新设备数据
+    '''
+    pk = forms.CharField(widget=Input(attrs={'class': "form-control",'readonly':''}),label=u'设备ID',)
+    class Meta:
+        model=Equipment
+        fields  = ['pk','name','typecode','price','work_flag','describe','load_date','equip_sd_argument','user']
+        widgets = {
+
+            'name':Input(attrs={'class': "form-control"}),
+            'typecode':Input(attrs={'class': "form-control"}),
+            'price':Input(attrs={'class': "form-control"}),
+            'work_flag':Input(attrs={'class': "form-control"}),
+            'load_date':DateTimeInput(attrs={'class': "form-control ",'readonly':''}),
+            'describe':Input(attrs={'class': "form-control"}),
+            'equip_sd_argument':Textarea(attrs={'class': "form-control",'rows': "3"}),
+            'user':Input(attrs={'class': "form-control ",'readonly':''}),
+        }
+
+    # 设置request
+    def __init__(self, *args, **kwargs):
+        self.request = kwargs.pop('request', None)
+        super(UpdateEquip, self).__init__(*args, **kwargs)
+
+    def clean(self):
+
+        cleaned_data = super(UpdateEquip, self).clean()
+        pk=cleaned_data.get('pk','')
+        if Equipment.objects.get(id=pk).user_id != self.request.user.id or \
+                        cleaned_data.get('user','').id != self.request.user.id:
+            self.add_error('pk', _(u'设备不属于该用户！'))
+        print cleaned_data
+
         return cleaned_data
 
 

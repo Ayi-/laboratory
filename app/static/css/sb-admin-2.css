@@ -21,7 +21,7 @@ body {
 @media(min-width:768px) {
     #page-wrapper {
         position: inherit;
-        margin: 0 0 0 200px;
+        margin: 0 0 0 180px;
 
         padding: 1px 1px 1px 1px;/*上,右,下,左设置页面边距?*/
         border-left: 1px solid #09C;
@@ -135,7 +135,7 @@ body {
 
         z-index: 1;
         position: fixed;
-        width: 200px;
+        width: 180px;
         top: 51px;
     }
 

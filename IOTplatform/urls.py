@@ -52,18 +52,15 @@ urlpatterns += patterns('app.views',
                         url(r'^index/$', login_required(Index.as_view()), name='index'),  # 主页
                         url(r'^login/$', 'loginApp', name='login'),  # 登陆
                         url(r'^register/$',loginout_required(Register.as_view()), name='register'),  # 注册
-                        url(r'^login4/$', 'login4App', name='login4'),  # APP登陆
                         url(r'^logout/$', 'logoutApp', name='logout'),  # 注销
-                        url(r'^app_data/$', 'app_data', name='app_data'),  # 获取数据
                         # 获取设备数据
                         url(r'^equipment/list/(?P<type>[\w]*)$', login_required(equip.as_view()), name='equip'),
-
                         url(r'^equipment/add/equip$', login_required(AddEquip.as_view()), name='addequip'),
                         url(r'^getGPS/$', 'getGPS', name='getGPS'),  # 获取GPS
                         url(r'^profile/$', login_required(profile.as_view()), name='profile'),  # 个人首页
 
                         # 获取datetables数据
-                        url(r'^ajax_dict/$', csrf_exempt(login_required(OrderListJson.as_view())), name='ajax-dict'),
+                        url(r'^ajax_dict$', csrf_exempt(login_required(OrderListJson.as_view())), name='ajax-dict'),
                         #url(r'^ajax_tem/$', 'ajax_tem', name='ajax_tem'),  # 获取模版
                         url(r'^sendcmd/$', 'sendcmd', name='sendcmd'),  # 发送命令
 

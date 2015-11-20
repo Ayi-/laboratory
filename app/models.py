@@ -26,8 +26,8 @@ from django.utils.translation import ugettext_lazy as _
 @python_2_unicode_compatible
 class Permission(models.Model):
     """
-    权限管理
-    """
+        权限管理
+        """
     name = models.CharField(_(u'权限名'), max_length=255, unique=True)  # 权限名
     code = models.IntegerField(_(u'权限代码'), unique=True)  # 权限代码
 
@@ -186,7 +186,7 @@ class AbstractBaseEquipment(models.Model):
 
     price = models.IntegerField(_(u'设备价格(元)'), default=0)
     work_flag = models.IntegerField(_(u'工作标志'), default=0)
-    describe = models.CharField(_(u'设备描述'), max_length=255, default="",
+    describe = models.CharField(_(u'设备显示样式'), max_length=255, default="",
                                 help_text=u'数据显示样式，如填写"数据",最终显示"数据:xxx"')
     load_date = models.DateTimeField(_(u'登记日期'), default=timezone.now)
     equip_sd_argument = models.TextField(_(u'设备描述'))

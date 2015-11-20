@@ -18,6 +18,7 @@ from django.contrib.auth.models import User, Group, AnonymousUser
 from django.core.urlresolvers import reverse_lazy  # 使用_lazy代替reverse,
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
+from django.views.generic.edit import BaseUpdateView
 
 from django_datatables_view.base_datatable_view import BaseDatatableView
 from django_datatables_view.mixins import LazyEncoder
@@ -26,7 +27,7 @@ from app.decorator import loginout_required
 
 from app.permissions import IsAdminOrReadOnly, IsAdmin, adminPermission
 from app.modelchoice import modelchoice
-from app.forms import LoginForm, EquipmentForm, RegisterForm
+from app.forms import LoginForm, EquipmentForm, RegisterForm, UpdateEquip
 from app.models import User as AppUser, Equipment, Permission, EquipStateLast, EquipStateAll, Position, LaboratoryState
 from app.serializers import UserSerializer, GroupSerializer, AppUserSerializer, EquipSerializer, PermissionSerializer, \
     EquipTempSerializer, EquipStateLastSerializer, PositionSerializer
@@ -132,38 +133,6 @@ class Register(CreateView):
         messages.success(self.request, u'注册成功！')
         return super(Register, self).form_valid(form)
 
-
-
-
-def login4App(request):
-    """
-    手机登陆，并修改登陆时间
-    :param request:
-    :return:
-    """
-    if request.method == 'GET':
-        username = request.GET.get('username')
-        password = request.GET.get('password')
-        if username and password:
-            user = authenticate(username=username,
-                                password=password)
-            if user:
-                user.set_last_time()  # 更新登录时间
-                login(request, user)
-                data = {'date_joined': request.user.date_joined.strftime('%Y-%m-%d %H:%M:%S'),
-                        'id': request.user.id,
-                        'username': request.user.username,
-                        'last_login': request.user.last_login.strftime('%Y-%m-%d %H:%M:%S'),
-                        'company_name': request.user.company.name,
-                        'permission_name': request.user.permission.name,
-                        'states': 'OK'}
-
-                return HttpResponse(json.dumps(data), content_type="application/json")
-    # 这个地方最好保证用json的方法传送数据，否则会出现意想不到的错误
-    # 用json类型返回数据到前端
-    return HttpResponse(json.dumps({'states': 'error'}), content_type="application/json")
-
-
 @login_required
 def logoutApp(request):
     """
@@ -189,19 +158,6 @@ def sendcmd(request):
     sock.close()
     return redirect('index')
 
-
-class equip(TemplateView):
-    """
-    返回设备详情界面
-    登陆表可访问
-    """
-    template_name = 'equipment.html'
-
-    def get_context_data(self, **kwargs):
-        data = kwargs.get('type','')
-        if data == 'eqstatelast':
-            self.template_name='equipstate.html'
-        return super(equip,self).get_context_data(**kwargs)
 
 # @login_required
 # def equip(request):
@@ -232,6 +188,51 @@ class AddEquip(CreateView):
         return super(AddEquip, self).form_valid(form)
 
 
+class equip(UpdateView):
+    """
+    返回设备详情界面
+    登陆表可访问
+    """
+    model = Equipment
+    template_name = 'equipment.html'
+    form_class = UpdateEquip
+    success_url = reverse_lazy('equip', kwargs={'type': 'equip'})
+
+    # 设置request
+    def get_form_kwargs(self):
+        kwargs = super(equip, self).get_form_kwargs()
+        kwargs['request'] = self.request
+        return kwargs
+
+    # 设置更新对象
+    def get_object(self, queryset=None):
+        return Equipment.objects.get(id=self.request.POST.get('pk'))
+        #return self.request.user
+
+    def get(self, request, *args, **kwargs):
+        self.object = None
+        data = kwargs.get('type','')
+        self.request.session['type']=data
+        form = self.get_form()
+        if data == 'eqstatelast':
+            order_columns = [f for f in EquipStateLast._meta.fields]
+            columns = [{'data': column.attname} for column in order_columns]
+            kwargs['order_columns'] = order_columns
+            kwargs['columns'] = json.dumps(columns)
+            self.template_name='equipstate.html'
+
+        return self.render_to_response(self.get_context_data(form=form,**kwargs))
+
+    def form_valid(self, form):
+        # This method is called when valid form data has been POSTed.
+        # It should return an HttpResponse.
+        # form.send_email()
+
+        messages.success(self.request, u'更新成功')
+
+        return super(equip, self).form_valid(form)
+
+
 class profile(UpdateView):
     """
     个人主页
@@ -245,45 +246,10 @@ class profile(UpdateView):
     def get_object(self, queryset=None):
         return self.request.user
 
-    def clean(self):
-        cleaned_data = super(profile, self)
-        # cleaned_username = cleaned_data.get("username","")
-        # cleaned_password = cleaned_data.get("password","")
-        return cleaned_data
-
     def form_valid(self, form):
         messages.success(self.request, u'更新成功')
         return super(profile, self).form_valid(form)
 
-
-@login_required
-def app_data(request):
-    """
-    APP获取设备数据
-    """
-    if request.method == 'GET':
-        user = request.user
-        supplier = user.company_id
-        search_type = request.GET.get('search_type')
-        state = request.GET.get('state', None)
-
-        qs_data = []
-        # 只保留每隔设备最近数据
-        if state:
-            qs = modelchoice.get(search_type).objects.only('id', 'supplier').filter(supplier=supplier)
-            for equipState in qs.iterator():
-                qe = equipState.constructionmachineworkstate_set
-                if qe.exists():
-                    # qs_data.append(qe.order_by('-state_date').first().get_dict())
-                    qs_data.append(qe.latest('state_date').get_dict())
-                    # print connection.queries
-        else:
-            qs = modelchoice.get(search_type).objects.filter(supplier=supplier)
-            for item in qs.iterator():
-                qs_data.append(item.get_dict())
-        data = {'states': 'OK', 'data': qs_data}
-        return HttpResponse(json.dumps(data), content_type="application/json")
-    return HttpResponse(json.dumps({'states': 'error'}), content_type="application/json")
 
 
 @login_required
@@ -328,16 +294,31 @@ class OrderListJson(BaseDatatableView):
     def get_initial_queryset(self):
         if not self.model:
             raise NotImplementedError("Need to provide a model or implement get_initial_queryset!")
+
+        # 管理員权限
         if adminPermission(self.request.user):
-            return self.model.objects.all()
-        if self.name != 'equip':
-            return self.model.objects.filter(equip__user=self.request.user.id)
-        return self.model.objects.filter(user_id=self.request.user.id)
+            queryset = self.model.objects.all()
+        else:
+            if self.name != 'equip':
+                queryset = self.model.objects.filter(equip__user=self.request.user.id)
+            else:
+                queryset = self.model.objects.filter(user_id=self.request.user.id)
+        if self.model_id != None:
+            queryset = queryset.filter(equip_id=self.model_id)
+        return queryset
 
     def initialize(self, *args, **kwargs):
         # 获取设备model
 
+        # 设置查询model
         self.name = self.request.session.get('model')
+
+        # 设置状态查询model的id
+        self.model_id = self.request.POST.get('model_id',None)
+
+        name = self.request.POST.get('model',None)
+        if name != None:
+            self.name = name
         self.model = modelchoice.get(self.name)
         # 获取用户公司对应id
         # self.company_id = self.request.user.company.id

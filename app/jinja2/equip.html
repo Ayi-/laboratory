@@ -5,7 +5,6 @@
 {% endblock title %}
 
 {% block css %}
-
     <!-- Timeline CSS
     <link href="./dist/css/timeline.css" rel="stylesheet">
     -->
@@ -16,7 +15,7 @@
     <link type="text/css" href="{{ static('css/dataTables.fixedHeader.css') }}" rel="stylesheet">
     <link type="text/css" href="{{ static('css/dataTables.responsive.css') }}" rel="stylesheet">
     <link type="text/css" href="{{ static('css/dataTables.colVis.css') }}" rel="stylesheet">
-
+    <link type="text/css" href="{{ static('css/bootstrap-datetimepicker.min.css') }}" rel="stylesheet">
     {#设置表格列可以移动#}
     {#    <link type="text/css" href="{{ static('css/dataTables.colReorder.css') }}" rel="stylesheet">#}
 
@@ -28,23 +27,22 @@
 
 {% block div %}
 {% endblock div %}
+
 {% block pageWrapper %}
 {% endblock pageWrapper %}
+
 {% block script %}
-
-    <!--Baidu Map API -->
-    {% if  type == "equip" %}
+    {% if request.session.get('type') == 'equip' %}
+        <!--Baidu Map API -->
         <script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=LYh7SdD7WXOvskvMjCT82SUE"></script>
+        {#<script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=LYh7SdD7WXOvskvMjCT82SUE"></script>#}
+        {#117.030266,25.034871#}
+        {#月山小学 117.034246,25.058359#}
     {% endif %}
-    {#<script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=LYh7SdD7WXOvskvMjCT82SUE"></script>#}
-    {#117.030266,25.034871#}
-    {#月山小学 117.034246,25.058359#}
-
     <!-- DataTables JavaScript -->
 
 
     <!-- Custom Theme JavaScript -->
-
 
     <!-- DataTables JavaScript -->
 
@@ -58,258 +56,273 @@
     <script src="{{ static('js/dataTables.responsive.js') }}"></script>
     <script src="{{ static('js/dataTables.colVis.js') }}"></script>
 
+    <script type="text/javascript" src="{{ static('js/bootstrap-datetimepicker.min.js') }}"></script>
+    <script type="text/javascript" src="{{ static('js/locales/bootstrap-datetimepicker.zh-CN.js') }}"
+            charset="UTF-8"></script>
+
     <script type="text/javascript">
-        function myFunction() { // catch the form's submit event
-            $.ajax({ // create an AJAX call...
-                {#                data: {'name': '{{ name }}'}, // get the form data#}
-                //type: 'GET', // GET or POST
-                url: '{{ url('equipmenttemp-detail',pk=type)}}', // the file to call; send the data to server
-                success: function (responseData) { // on success.. get respose from the server
 
-                    detailsFlag = false;
-                    var ob = responseData.ob;
-                    var order = [[0, "asc"]];
-                    var eqStateFlag = false;
-                    var equipFlag = false;
-
-
-                    if (ob == 'eqstate') {
-                        {#                        order = [[-2, "desc"]];#}
-                        eqStateFlag = true;
-                    }
-
-                    if (ob == 'equip') {
-                        equipFlag = true;
-                    }
-
-                    var oColumns = responseData.columns;
-                    $('#page-wrapper').html(responseData.content_html);             // update the DIV with response
-                    oTable = $('#example').DataTable({
-                        serverSide: true,
-                        processing: true,
-                        //"stateSave": true,//状态保存
-                        //"deferRender": true,//延迟渲染
-                        //设置滚动条
-                        //'scrollY': 768,
-                        //"scrollCollapse": true,
-                        //"scrollX":true,
-                        //"autowidth": false,
-                        fixedHeader: true,
-                        "responsive": true,
-                        "language": {
-                            "url": "{{ static('dataTables.chinese.lang') }}"
-                        },
-                        "ajax": {
-                            "url": "{{ url('ajax-dict')  }} ",
-                            "type": 'POST'
-
-                        },
-                        "PaginationType" : "full_numbers",
-                        "order": order,
-                        {#                        行设置#}
-                        "createdRow": function (row, data, dataIndex) {
-                            {# 行颜色设置 #}
-                            //console.log(data);
-                            if (eqStateFlag) {
-                                var state = data['state'];
-
-                                {# 根据状态显示颜色 #}
-                                {#                                if (state == 0) {#}
-                                {#                                    $(row).find('td').eq(11).text('维修中');#}
-                                {#                                    //$(row).text('是');#}
-                                {#                                    $(row).addClass('warning');#}
-                                {#                                }#}
-                                {#                                else if (state == 1) {#}
-                                {#                                    $(row).find('td').eq(11).text('正常');#}
-                                {#                                    $(row).addClass('success');#}
-                                {#                                }#}
-                                {#                                else if (state == 2) {#}
-                                {#                                    $(row).find('td').eq(11).text('执勤中');#}
-                                {#                                    $(row).addClass('info');#}
-                                {#                                }#}
-                                {#                                else if (state == 3) {#}
-                                {#                                    $(row).find('td').eq(11).text('故障!');#}
-                                {#                                    $(row).addClass('danger');#}
-                                {#                                }#}
-                                {#                                else if (state == 4) {#}
-                                {#                                    $(row).find('td').eq(11).text('出租且正在维修');#}
-                                {#                                    $(row).find('td').eq(11).text('执勤中');#}
-                                {#                                    $(row).addClass('info');#}
-                                {#                                }#}
-                                {##}
-                                {#                            }#}
-                                {#                            else if (equipFlag) {#}
-                                {##}
-                                {#                                rf = data['rent_flag'];#}
-                                {#                                mf = data['maintenance_flag'];#}
-                                {##}
-                                {# 根据状态显示颜色 #}
-                                {#                                if (rf == false && mf == false) {#}
-                                {#                                    $(row).addClass('success');#}
-                                {#                                }#}
-                                {#                                else if (rf == true && mf == false) {#}
-                                {#                                    $(row).addClass('warning');#}
-                                {#                                }#}
-                                {#                                else if (rf == false && mf == true) {#}
-                                {#                                    $(row).addClass('info');#}
-                                {#                                }#}
-                                {#                                else if (rf == true && mf == true) {#}
-                                {#                                    $(row).addClass('danger');#}
-                                {#                                }#}
-                            }
-
-                        },
-                        {#列设置#}
-                        "columnDefs": [
-                            {# 参数宽度固定 #}
-                            {"width": "15%", "targets": [-3]},
-                            {#                            {"heigh": "5%", "targets": '_all'},#}
-                            {#取消控制栏的搜索和排序#}
-                            {
-                                "searchable": false,
-                                "orderable": false,
-                                "targets": -1
-                            },
-                            {#隐藏#}
-                            {#                            {#}
-                            {#                                "targets": [10,11],#}
-                            {#                                "visible": false,#}
-                            {#                                "searchable": false#}
-                            {##}
-                            {#                            },#}
-                            {# 添加控制按钮 #}
-                            {
-                                "targets": -1,
-                                "data": null,
-                                "defaultContent": "<button id='test1' class='btn btn-primary''data-toggle='modal' data-target='#myModal'  >控制</button>"
-                            },
-                            {#居中显示#}
-                            {className: "textCenter", "targets": ''},
-                            {# 创建单元时回调函数 #}
-                            {
-                                "targets": 'all',
-                                {#                                "targets": [7, 8],#}
-                                "createdCell": function (td, cellData, rowData, row, col) {
-                                    {#                                如果targets为多个，参数则为多组，处理为从左往右，从上到下循环#}
-                                    {#                                每一组#}
-                                    {#                                td为当前td元素#}
-                                    {#                                cellData 当前单元数据#}
-                                    {#                                rowData为当前行所有数据#}
-                                    {#                                row为当前行索引(从0开始)#}
-                                    {#                                col为当前列索引(从0开始)#}
-
-                                    {#                                if (ob == 'equip')#}
-                                    {#                                {#}
-                                    {#                                 if (col == 5 || col == 6) #}
-                                    {#                                 {#}
-                                    {#                                    if (cellData == true) {#}
-                                    {#                                        $(td).addClass('warning')#}
-                                    {#                                    }#}
-                                    {#                                    else {#}
-                                    {#                                        $(td).addClass('danger')#}
-
-                                    {# 裁剪详细数据 #}
-                                    if (equipFlag) {
-                                        if (cellData.length > 20) {
-                                            $(td).addClass('control');
-                                            $(td).css("cursor", "pointer");
-                                            $(td).html('<div class="Details">' + cellData.substr(0, 20) + '...' + '</div>' + '<div class="innerDetails">' + cellData + '</div>');
-
-                                        }
-                                    }
-                                    {#裁剪函数结束#}
-                                }
-                            }{#列设置回调结束#}
-                        ], {#列参数设置结束#}
-                        {# 表格数据 #}
-                        'columns': oColumns,
-                        //dom: 'Rlfrtip',
-                        {# 定义DOM,表格底部样式 #}
-                        dom: 'R<"row"<"col-sm-3" l>' +
-                        '<"col-sm-3" C>>' +
-                        '<"row" <"col-sm-12" tr>>' +
-                        '<"row"<"col-sm-6" i>' +
-                        '<"col-sm-6" p>>',
-                        {# 定义显示列表 #}
-                        colVis: {
-                            activate: "mouseover",
-                            buttonText: "显示列表",
-                            "align": "left"
-                        },
-                        {# 设置按下回车才搜索 #}
-                        "initComplete": function () {
-                            {# 应用固定表格头部设置 #}
-                            new $.fn.dataTable.FixedHeader(oTable);
-                            {# 为每一行添加搜索 #}
-                            // Setup - add a text input to each footer cell
-                            $('#example tfoot th').each(function () {
-                                var title = $('#example thead th').eq($(this).index()).text();
-                                $(this).html('<input type="text" placeholder="搜索 ' + title + '" />');
-                            });
-
-                            // Apply the search
-                            {# 应用搜索 #}
-                            oTable.columns().every(function () {
-                                var column = this;
-
-                                $('input', this.footer()).keyup(function (e) {
-                                    if (e.keyCode == 13) {
-                                        column
-                                                .search(this.value)
-                                                .draw();
-                                    }
-
-                                });
-                            });
-                            {#oTable.columns().eq( 0 ).each( function ( colIdx ) {#}
-                            {#        $( 'input', oTable.column( colIdx ).footer() ).on( 'keyup change', function () {#}
-                            {#            oTable#}
-                            {#                .column( colIdx )#}
-                            {#                .search( this.value )#}
-                            {#                .draw();#}
-                            {#        } );#}
-                            {#    } );#}
+            function myFunction() { // catch the form's submit event
+                $.ajax({ // create an AJAX call...
+                    {#                data: {'name': '{{ name }}'}, // get the form data#}
+                    //type: 'GET', // GET or POST
+                    url: '{{ url('equipmenttemp-detail',pk=request.session.get('type'))}}', // the file to call; send the data to server
+                    success: function (responseData) { // on success.. get respose from the server
+                        detailsFlag = false;
+                        var ob = responseData.ob;
+                        var order = [[0, "asc"]];
+                        var eqStateFlag = false;
+                        var equipFlag = false;
+                        if (ob == 'eqstate') {
+                            {#                        order = [[-2, "desc"]];#}
+                            eqStateFlag = true;
                         }
-                    });// end of datatables;
-                    {#表格初始化#}
+                        if (ob == 'equip') {
+                            equipFlag = true;
+                        }
+                        var oColumns = responseData.columns;
+                        $('#page-wrapper').html(responseData.content_html);             // update the DIV with response
+                        oTable = $('#example').DataTable({
+                            serverSide: true,
+                            processing: true,
+                            "stateSave": true,//状态保存
+                            "deferRender": true,//延迟渲染
+                            //设置滚动条
+                            //'scrollY': 768,
+                            //"scrollCollapse": true,
+                            //"scrollX":true,
+                            autoWidth: true,
+                            fixedHeader: {
+                                header: true,
+                                footer: true
+                            },
+                            responsive: true,
+                            "language": {
+                                "url": "{{ static('dataTables.chinese.lang') }}"
+                            },
+                            "ajax": {
+                                "url": "{{ url('ajax-dict')  }} ",
+                                "type": 'POST'
 
-                    {##}
-                    {#                                        //30s重置#}
-                    {#                                        setInterval(function () {#}
-                    {#                                            oTable.ajax.reload(null, false); // 刷新表格数据，分页信息不会重置#}
-                    {#                                        }, 10000);#}
+                            },
+                            "PaginationType": "full_numbers",
+                            "order": order,
+                            {#                        行设置#}
+                            "createdRow": function (row, data, dataIndex) {
+                                {# 行颜色设置 #}
+                                //console.log(data);
+                                if (eqStateFlag) {
+                                    var state = data['state'];
 
-                    {#                    function getCookie(name) {#}
-                    {#                        var cookieValue = null;#}
-                    {#                        if (document.cookie && document.cookie != '') {#}
-                    {#                            var cookies = document.cookie.split(';');#}
-                    {#                            for (var i = 0; i < cookies.length; i++) {#}
-                    {#                                var cookie = jQuery.trim(cookies[i]);#}
-                    {#                                // Does this cookie string begin with the name we want?#}
-                    {#                                if (cookie.substring(0, name.length + 1) == (name + '=')) {#}
-                    {#                                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));#}
-                    {#                                    break;#}
-                    {#                                }#}
-                    {#                            }#}
-                    {#                        }#}
-                    {#                        return cookieValue;#}
-                    {#                    }#}
+                                    {# 根据状态显示颜色 #}
+                                    {#                                if (state == 0) {#}
+                                    {#                                    $(row).find('td').eq(11).text('维修中');#}
+                                    {#                                    //$(row).text('是');#}
+                                    {#                                    $(row).addClass('warning');#}
+                                    {#                                }#}
+                                    {#                                else if (state == 1) {#}
+                                    {#                                    $(row).find('td').eq(11).text('正常');#}
+                                    {#                                    $(row).addClass('success');#}
+                                    {#                                }#}
+                                    {#                                else if (state == 2) {#}
+                                    {#                                    $(row).find('td').eq(11).text('执勤中');#}
+                                    {#                                    $(row).addClass('info');#}
+                                    {#                                }#}
+                                    {#                                else if (state == 3) {#}
+                                    {#                                    $(row).find('td').eq(11).text('故障!');#}
+                                    {#                                    $(row).addClass('danger');#}
+                                    {#                                }#}
+                                    {#                                else if (state == 4) {#}
+                                    {#                                    $(row).find('td').eq(11).text('出租且正在维修');#}
+                                    {#                                    $(row).find('td').eq(11).text('执勤中');#}
+                                    {#                                    $(row).addClass('info');#}
+                                    {#                                }#}
+                                    {##}
+                                    {#                            }#}
+                                    {#                            else if (equipFlag) {#}
+                                    {##}
+                                    {#                                rf = data['rent_flag'];#}
+                                    {#                                mf = data['maintenance_flag'];#}
+                                    {##}
+                                    {# 根据状态显示颜色 #}
+                                    {#                                if (rf == false && mf == false) {#}
+                                    {#                                    $(row).addClass('success');#}
+                                    {#                                }#}
+                                    {#                                else if (rf == true && mf == false) {#}
+                                    {#                                    $(row).addClass('warning');#}
+                                    {#                                }#}
+                                    {#                                else if (rf == false && mf == true) {#}
+                                    {#                                    $(row).addClass('info');#}
+                                    {#                                }#}
+                                    {#                                else if (rf == true && mf == true) {#}
+                                    {#                                    $(row).addClass('danger');#}
+                                    {#                                }#}
+                                }
 
-                    {% block modalshow %}
-                    {% endblock modalshow %}
-                    {# ajax函数结束 #}
-                }//end ajax succession回调
-            });//end ajax
+                            },
+                            {#列设置#}
+                            "columnDefs": [
+                                {# 参数宽度固定 #}
+                                //{"width": "20px", "targets": ['all']},
+                                {#                            {"heigh": "5%", "targets": '_all'},#}
+                                {#取消控制栏的搜索和排序#}
+                                {
+                                    "searchable": false,
+                                    "orderable": false,
+                                    "targets": -1
+                                },
+                                {#隐藏#}
+                                {#                            {#}
+                                {#                                "targets": [10,11],#}
+                                {#                                "visible": false,#}
+                                {#                                "searchable": false#}
+                                {##}
+                                {#                            },#}
+                                {# 添加控制按钮 #}
+                                {
+                                    "targets": -1,
+                                    "data": null,
+                                    "defaultContent": "<button id='test1' class='btn btn-primary''data-toggle='modal' data-target='#myModal'  >详情</button>"
+                                },
+                                {#居中显示#}
+                                {className: "textCenter", "targets": ''},
+                                {# 创建单元时回调函数 #}
+                                {
+                                    "targets": [-4],
+                                    {#                                "targets": [7, 8],#}
+                                    "createdCell": function (td, cellData, rowData, row, col) {
+                                        {#                                如果targets为多个，参数则为多组，处理为从左往右，从上到下循环#}
+                                        {#                                每一组#}
+                                        {#                                td为当前td元素#}
+                                        {#                                cellData 当前单元数据#}
+                                        {#                                rowData为当前行所有数据#}
+                                        {#                                row为当前行索引(从0开始)#}
+                                        {#                                col为当前列索引(从0开始)#}
 
-            return false;   //avoid submitting the content to server directly
-        }//end myFunction
+                                        {#                                if (ob == 'equip')#}
+                                        {#                                {#}
+                                        {#                                 if (col == 5 || col == 6) #}
+                                        {#                                 {#}
+                                        {#                                    if (cellData == true) {#}
+                                        {#                                        $(td).addClass('warning')#}
+                                        {#                                    }#}
+                                        {#                                    else {#}
+                                        {#                                        $(td).addClass('danger')#}
 
-        {# 重载表格头 #}
-        $('.FixedHeader_Cloned').remove();
-        $(window).resize(function () {
-            $('.FixedHeader_Cloned').remove();
-            new $.fn.dataTable.FixedHeader(oTable);
-        });
+                                        {# 裁剪详细数据 #}
+                                        if (equipFlag) {
+                                            if (cellData.length > 20) {
+                                                $(td).addClass('control');
+                                                $(td).css("cursor", "pointer");
+                                                $(td).html('<div class="Details">' + cellData.substr(0, 20) + '...' + '</div>' + '<div class="innerDetails">' + cellData + '</div>');
+
+                                            }
+                                        }
+                                        {#裁剪函数结束#}
+                                    }
+                                }{#列设置回调结束#}
+                            ], {#列参数设置结束#}
+                            {# 表格数据 #}
+                            'columns': oColumns,
+                            //dom: 'Rlfrtip',
+                            {# 定义DOM,表格底部样式 #}
+                            dom: 'R<"row"<"col-sm-3" l>' +
+                            '<"col-sm-3" C>>' +
+                            '<"row" <"col-sm-12" tr>>' +
+                            '<"row"<"col-sm-6" i>' +
+                            '<"col-sm-6" p>>',
+                            {# 定义显示列表 #}
+                            colVis: {
+                                activate: "mouseover",
+                                buttonText: "显示列表",
+                                "align": "left"
+                            },
+                            {# 设置按下回车才搜索 #}
+                            "initComplete": function () {
+                                {# 应用固定表格头部设置 #}
+{#                                new $.fn.dataTable.FixedHeader(oTable);#}
+{#                                $('.FixedHeader_Cloned').remove();#}
+                                {# 为每一行添加搜索 #}
+                                // Setup - add a text input to each footer cell
+                                $('#example tfoot th').each(function () {
+                                    //var title = $('#example thead th').eq($(this).index()).text();
+                                    $(this).html('<input type="text" placeholder="搜索" />');
+                                });
+
+                                // Apply the search
+                                {# 应用搜索 #}
+                                oTable.columns().every(function () {
+                                    var column = this;
+
+                                    $('input', this.footer()).keyup(function (e) {
+                                        if (e.keyCode == 13) {
+                                            column
+                                                    .search(this.value)
+                                                    .draw();
+                                        }
+
+                                    });
+                                });
+                                {#oTable.columns().eq( 0 ).each( function ( colIdx ) {#}
+                                {#        $( 'input', oTable.column( colIdx ).footer() ).on( 'keyup change', function () {#}
+                                {#            oTable#}
+                                {#                .column( colIdx )#}
+                                {#                .search( this.value )#}
+                                {#                .draw();#}
+                                {#        } );#}
+                                {#    } );#}
+                            }
+                        });// end of datatables;
+                        {#表格初始化#}
+
+                        {##}
+                        {#                                        //30s重置#}
+                        {#                                        setInterval(function () {#}
+                        {#                                            oTable.ajax.reload(null, false); // 刷新表格数据，分页信息不会重置#}
+                        {#                                        }, 10000);#}
+
+                        {#                    function getCookie(name) {#}
+                        {#                        var cookieValue = null;#}
+                        {#                        if (document.cookie && document.cookie != '') {#}
+                        {#                            var cookies = document.cookie.split(';');#}
+                        {#                            for (var i = 0; i < cookies.length; i++) {#}
+                        {#                                var cookie = jQuery.trim(cookies[i]);#}
+                        {#                                // Does this cookie string begin with the name we want?#}
+                        {#                                if (cookie.substring(0, name.length + 1) == (name + '=')) {#}
+                        {#                                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));#}
+                        {#                                    break;#}
+                        {#                                }#}
+                        {#                            }#}
+                        {#                        }#}
+                        {#                        return cookieValue;#}
+                        {#                    }#}
+
+                        {% block modalshow %}
+                        {% endblock modalshow %}
+
+                        {# ajax函数结束 #}
+                    }//end ajax succession回调
+                });//end ajax
+
+                return false;   //avoid submitting the content to server directly
+
+            }//end myFunction
+
+            {# 重载表格头 #}
+
+{#            $('.FixedHeader_Cloned').remove();#}
+{#            $(window).resize(function () {#}
+{#                $('.FixedHeader_Cloned').remove();#}
+{#                new $.fn.dataTable.FixedHeader(oTable);#}
+{#            });#}
+
+            {#        日期支持#}
+            $('#id_load_date').datetimepicker({
+                format: 'yyyy-mm-dd hh:ii',
+                rtl: true,
+                language: 'zh-CN'
+            });
 
     </script>
+
 {% endblock script %}
