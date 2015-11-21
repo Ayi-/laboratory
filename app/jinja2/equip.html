@@ -30,7 +30,6 @@
 {% endblock css %}
 
 {% block bodySet %}
-    onload="myFunction()"
 {% endblock bodySet %}
 
 {% block div %}
@@ -40,13 +39,7 @@
 {% endblock pageWrapper %}
 
 {% block script %}
-    {% if request.session.get('type') == 'equip' %}
-        <!--Baidu Map API -->
-        <script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=LYh7SdD7WXOvskvMjCT82SUE"></script>
-        {#<script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=LYh7SdD7WXOvskvMjCT82SUE"></script>#}
-        {#117.030266,25.034871#}
-        {#月山小学 117.034246,25.058359#}
-    {% endif %}
+
     <!-- DataTables JavaScript -->
 
 
@@ -54,31 +47,37 @@
 
     <!-- DataTables JavaScript -->
 {#    datatables支持#}
-    <script type="text/javascript" charset="utf8" src="{{ static('js/jquery.dataTables.min.js') }}"></script>
-{#    bootstrap样式支持#}
-    <script type="text/javascript" charset="utf8" src="{{ static('js/dataTables.bootstrap.min.js') }}"></script>
-{#    修复表头#}
-    <script src="{{ static('js/dataTables.fixedHeader.js') }}"></script>
+    <script type="text/javascript" src="{{ static('js/jquery.dataTables.min.js') }}"></script>
+    {#    bootstrap样式支持#}
+    <script type="text/javascript" src="{{ static('js/dataTables.bootstrap.min.js') }}"></script>
+    {#    修复表头#}
+    <script type="text/javascript" src="{{ static('js/dataTables.fixedHeader.js') }}"></script>
+    {#    跳转页面支持#}
+    <script type="text/javascript" src="{{ static('js/dataTables.input.js') }}"></script>
+    {#    自定义按钮支持#}
+    <script type="text/javascript" src="{{ static('js/dataTables.buttons.min.js') }}"></script>
+    <script type="text/javascript" src="{{ static('js/buttons.bootstrap.min.js') }}"></script>
+    {#    自动调整列格式#}
+        <script type="text/javascript" src="{{ static('js/dataTables.responsive.js') }}"></script>
 
     {#设置表格列可以移动#}
-    {#<script src="{{ static('js/dataTables.colReorder.js') }}"></script>#}
-{#    自动调整列格式#}
-    <script src="{{ static('js/dataTables.responsive.js') }}"></script>
-{#    自定义显示列#}
-    <script src="{{ static('js/dataTables.colVis.js') }}"></script>
-{#    跳转页面支持#}
-    <script src="{{ static('js/dataTables.input.js') }}"></script>
-{#    自定义按钮支持#}
-<script src="{{ static('js/dataTables.buttons.min.js') }}"></script>
-    <script src="{{ static('js/buttons.bootstrap.min.js') }}"></script>
+    {#    <script src="{{ static('js/dataTables.colReorder.js') }}"></script>#}
+    {#    自定义显示列#}
+    <script type="text/javascript" src="{{ static('js/dataTables.colVis.js') }}"></script>
     {#日期部件支持#}
     <script type="text/javascript" src="{{ static('js/bootstrap-datetimepicker.min.js') }}"></script>
     <script type="text/javascript" src="{{ static('js/locales/bootstrap-datetimepicker.zh-CN.js') }}"
             charset="UTF-8"></script>
-
+    {% if request.session.get('type') == 'equip' %}
+        <!--Baidu Map API -->
+        <script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=LYh7SdD7WXOvskvMjCT82SUE"></script>
+        {#<script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=LYh7SdD7WXOvskvMjCT82SUE"></script>#}
+        {#117.030266,25.034871#}
+        {#月山小学 117.034246,25.058359#}
+    {% endif %}
     <script type="text/javascript">
 
-            function myFunction() { // catch the form's submit event
+ window.onload=function() { // catch the form's submit event
                 $.ajax({ // create an AJAX call...
                     {#                data: {'name': '{{ name }}'}, // get the form data#}
                     //type: 'GET', // GET or POST
@@ -89,30 +88,30 @@
                         var order = [[0, "asc"]];
                         var eqStateFlag = false;
                         var equipFlag = false;
-                        if (ob == 'eqstate') {
+{#                        if (ob == 'eqstate') {#}
                             {#                        order = [[-2, "desc"]];#}
-                            eqStateFlag = true;
-                        }
-                        if (ob == 'equip') {
-                            equipFlag = true;
-                        }
+{#                            eqStateFlag = true;#}
+{#                        }#}
+{#                        if (ob == 'equip') {#}
+{#                            equipFlag = true;#}
+{#                        }#}
                         var oColumns = responseData.columns;
                         $('#page-wrapper').html(responseData.content_html);             // update the DIV with response
                         oTable = $('#example').DataTable({
                             serverSide: true,
                             processing: true,
-                            "stateSave": true,//状态保存
-                            "deferRender": true,//延迟渲染
+                            //"stateSave": false,//状态保存
+                            //"deferRender": true,//延迟渲染
                             //设置滚动条
                             //'scrollY': 768,
                             //"scrollCollapse": true,
                             //"scrollX":true,
-                            autoWidth: true,
-                            fixedHeader: {
-                                header: true,
-                                footer: true
-                            },
-                            responsive: true,
+                            //autoWidth: false,
+{#                            fixedHeader: {#}
+{#                                header: true,#}
+{#                                footer: false#}
+{#                            },#}
+                            //responsive: true,
                             "language": {
                                 "url": "{{ static('dataTables.chinese.lang') }}"
                             },
@@ -121,67 +120,18 @@
                                 "type": 'POST'
 
                             },
-                            //"PaginationType": "full_numbers",
+                            "PaginationType": "full_numbers",
                             //设置跳页
-                             "pagingType":"input",
-                            "order": order,
+                             //"pagingType":"input",
+                            //"order": order,
                             {#                        行设置#}
                             "createdRow": function (row, data, dataIndex) {
-                                {# 行颜色设置 #}
-                                //console.log(data);
-                                if (eqStateFlag) {
-                                    var state = data['state'];
-
-                                    {# 根据状态显示颜色 #}
-                                    {#                                if (state == 0) {#}
-                                    {#                                    $(row).find('td').eq(11).text('维修中');#}
-                                    {#                                    //$(row).text('是');#}
-                                    {#                                    $(row).addClass('warning');#}
-                                    {#                                }#}
-                                    {#                                else if (state == 1) {#}
-                                    {#                                    $(row).find('td').eq(11).text('正常');#}
-                                    {#                                    $(row).addClass('success');#}
-                                    {#                                }#}
-                                    {#                                else if (state == 2) {#}
-                                    {#                                    $(row).find('td').eq(11).text('执勤中');#}
-                                    {#                                    $(row).addClass('info');#}
-                                    {#                                }#}
-                                    {#                                else if (state == 3) {#}
-                                    {#                                    $(row).find('td').eq(11).text('故障!');#}
-                                    {#                                    $(row).addClass('danger');#}
-                                    {#                                }#}
-                                    {#                                else if (state == 4) {#}
-                                    {#                                    $(row).find('td').eq(11).text('出租且正在维修');#}
-                                    {#                                    $(row).find('td').eq(11).text('执勤中');#}
-                                    {#                                    $(row).addClass('info');#}
-                                    {#                                }#}
-                                    {##}
-                                    {#                            }#}
-                                    {#                            else if (equipFlag) {#}
-                                    {##}
-                                    {#                                rf = data['rent_flag'];#}
-                                    {#                                mf = data['maintenance_flag'];#}
-                                    {##}
-                                    {# 根据状态显示颜色 #}
-                                    {#                                if (rf == false && mf == false) {#}
-                                    {#                                    $(row).addClass('success');#}
-                                    {#                                }#}
-                                    {#                                else if (rf == true && mf == false) {#}
-                                    {#                                    $(row).addClass('warning');#}
-                                    {#                                }#}
-                                    {#                                else if (rf == false && mf == true) {#}
-                                    {#                                    $(row).addClass('info');#}
-                                    {#                                }#}
-                                    {#                                else if (rf == true && mf == true) {#}
-                                    {#                                    $(row).addClass('danger');#}
-                                    {#                                }#}
-                                }
 
                             },
                             {#列设置#}
                             "columnDefs": [
                                 {# 参数宽度固定 #}
-                                //{"width": "20px", "targets": ['all']},
+                                {"width": "10%", "targets": 0},
                                 {#                            {"heigh": "5%", "targets": '_all'},#}
                                 {#取消控制栏的搜索和排序#}
                                 {
@@ -271,7 +221,6 @@
                                 {# 应用搜索 #}
                                 oTable.columns().every(function () {
                                     var column = this;
-
                                     $('input', this.footer()).keyup(function (e) {
                                         if (e.keyCode == 13) {
                                             column
@@ -321,10 +270,15 @@
                         {# ajax函数结束 #}
                     }//end ajax succession回调
                 });//end ajax
+$('#id_load_date').datetimepicker({
+                format: 'yyyy-mm-dd hh:ii',
+                rtl: true,
+                language: 'zh-CN'
+            });
 
-                return false;   //avoid submitting the content to server directly
 
-            }//end myFunction
+            };
+            //end myFunction
 
             {# 重载表格头 #}
 
@@ -335,11 +289,7 @@
 {#            });#}
 
             {#        日期支持#}
-            $('#id_load_date').datetimepicker({
-                format: 'yyyy-mm-dd hh:ii',
-                rtl: true,
-                language: 'zh-CN'
-            });
+
 
     </script>
 

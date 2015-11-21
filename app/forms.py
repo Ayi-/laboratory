@@ -33,6 +33,7 @@ class LoginForm(forms.Form):
         cleaned_data = super(LoginForm, self).clean()
         cleaned_username = cleaned_data.get("username", "")
         cleaned_password = cleaned_data.get("password", "")
+        print cleaned_data
         try:
             user = User.objects.get(username=cleaned_username)
         except User.DoesNotExist:

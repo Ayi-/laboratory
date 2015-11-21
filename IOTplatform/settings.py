@@ -35,7 +35,8 @@ from celery.schedules import crontab
 SECRET_KEY = '_!#%pvc2%0r8et8!4ua4&*m(6wg1yc8hbxygz30!+go)hv0-ca'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
+TEMPLATE_DEBUG =False
 
 ALLOWED_HOSTS = ['*']
 
@@ -168,7 +169,7 @@ WSGI_APPLICATION = 'IOTplatform.wsgi.application'
 # https://docs.djangoproject.com/en/1.8/ref/settings/#databases
 
 
-if DEBUG:
+if not DEBUG:
     MYSQL_DB = 'iotplatform'
     MYSQL_USER = 'root'
     MYSQL_PASS = '0000'
@@ -215,7 +216,12 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.8/howto/static-files/
 
 STATIC_URL = '/static/'
-STATIC_ROOT = os.path.join(BASE_DIR, "static/")
+STATIC_ROOT = os.path.join(BASE_DIR, "static")
+
+STATICFILES_DIRS = (
+    os.path.join(BASE_DIR,"app/static"),
+)
+
 # TEMPLATE_DIRS = (
 #     os.path.join(BASE_DIR, 'templates'),
 # )
