@@ -187,7 +187,7 @@
                                 {
                                     "searchable": false,
                                     "orderable": false,
-                                    "targets": -1
+                                    "targets": [-1]
                                 },
                                 {#隐藏#}
                                 {#                            {#}
@@ -203,7 +203,7 @@
                                     "defaultContent": "<button id='test1' class='btn btn-primary''data-toggle='modal' data-target='#myModal'  >详情</button>"
                                 },
                                 {#居中显示#}
-                                {className: "textCenter", "targets": ''},
+                                {className: "textCenter", "targets": '_all'},
                                 {# 创建单元时回调函数 #}
                                 {
                                     "targets": [-4],
@@ -258,7 +258,7 @@
                             {# 设置按下回车才搜索 #}
                             "initComplete": function () {
                                 {# 应用固定表格头部设置 #}
-                                new $.fn.dataTable.FixedHeader(oTable);
+{#                                new $.fn.dataTable.FixedHeader(oTable);#}
 {#                                $('.FixedHeader_Cloned').remove();#}
                                 {# 为每一行添加搜索 #}
                                 // Setup - add a text input to each footer cell

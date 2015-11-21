@@ -5,21 +5,6 @@
 {% endblock title %}
 
 {% block css %}
-
-    <!-- Timeline CSS
-    <link href="./dist/css/timeline.css" rel="stylesheet">
-    -->
-    <!-- DataTables CSS -->
-    {#    <link type="text/css" href="{{ static("css/jquery.dataTables.css") }}" rel="stylesheet">#}
-
-    <link type="text/css" href="{{ static('css/dataTables.bootstrap.css') }}" rel="stylesheet">
-    <link type="text/css" href="{{ static('css/dataTables.fixedHeader.css') }}" rel="stylesheet">
-    <link type="text/css" href="{{ static('css/dataTables.responsive.css') }}" rel="stylesheet">
-    <link type="text/css" href="{{ static('css/dataTables.colVis.css') }}" rel="stylesheet">
-
-    {#设置表格列可以移动#}
-    {#    <link type="text/css" href="{{ static('css/dataTables.colReorder.css') }}" rel="stylesheet">#}
-
 {% endblock css %}
 
 {% block bodySet %}
@@ -85,16 +70,5 @@
 
 {% endblock pageWrapper %}
 {% block script %}
-{#    <script>#}
-{#        //定时关闭alert#}
-{#        $("[role='alert']").fadeTo(5000, 500).slideUp(500, function () {#}
-{##}
-{#            //$(this).alert('close');#}
-{#            $(this).remove("*");#}
-{#        });#}
-{##}
-{#        // 经过就关闭#}
-{#        $("[role='alert']").hover(function () {#}
-{#            $(this).remove("*");#}
-{#        });</script>#}
+
 {% endblock script %}
